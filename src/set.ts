@@ -1,34 +1,38 @@
+/// <reference no-default-lib="true" />
+/// <reference lib="esnext" />
+/// <reference lib="dom" />
+/// <reference lib="dom.iterable" />
+
 /**
- * Simple extension of the JavaScript `Set` interface, with `JSON` support.
- * In contrast to the native `Set`, this will serialize into a valid `JSON`
- * array, rather than an empty object (`{}`).
+ * Extends the builtin `Set` interface, adding a `sort` method, getter/setters
+ * for `size`, a `toString` method, and a `toJSON` method. Serializes into a
+ * valid `JSON` array when passed to `JSON.stringify` (rather than `{}`, like
+ * its simple-minded cousin, Set).
  * @example JSON.stringify(new SerializeSet([1, 1, 2, 3]));
  * // [1, 2, 3] - serialized into a valid JSON array
  * @example JSON.stringify(new Set([1, 2, 2, 3]));
  * // {} - standard Set does *not* serialize into JSON
- * @class SerializeSet
- * @extends Set
- * @see {@link https://github.com/deno911/x/blob/main/src/set.ts}
- * @author Nicholas Berlette <nick@berlette.com>
+ * @see {@link https://doc.deno.land/https://deno.land/x/911/src/set.ts}
+ * @author Nicholas Berlette <https://github.com/nberlette>
  * @license MIT
  */
 export class SerializeSet<T extends any> extends Set<T> {
-  get [Symbol.species]() {
-    return SerializeSet;
+  constructor(values?: readonly T[]);
+  constructor(initial?: Iterable<T>);
+  constructor(initial?: any) {
+    return super(initial), this;
   }
 
   get [Symbol.toStringTag](): "SerializeSet" {
     return "SerializeSet" as const;
   }
 
-  [Symbol.toPrimitive](hint: "number"): number;
-
   [Symbol.toPrimitive](hint: "string" | "number" | "default"): string | number {
-    return hint === "number" ? this?.size! : this.toString();
+    return hint === "number" ? this.size! : this.toString();
   }
 
   toJSON(): T[] {
-    return Array.from(this.values?.());
+    return Array.from(this.values());
   }
 
   toString(): string {
@@ -39,9 +43,9 @@ export class SerializeSet<T extends any> extends Set<T> {
     return super.size;
   }
 
-  set size(value: number) {
+  set size(value: number){
     let i = 0;
-    const values = [...this.values?.()];
+    const values = [...this.values()];
     for (const val of values) {
       i >= value && this.delete(val), i++;
     }
