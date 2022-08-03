@@ -15,10 +15,6 @@ export declare namespace State {
     | Record<string, T>
     | Iterable<[string, T]>;
 
-  type IterableInit<T> = T extends Iterable<[string, infer R]> ? R
-    : T extends IterableIterator<[string, infer I]> ? I
-    : never;
-
   interface Context<T> {
     state: State<T>;
   }
@@ -281,12 +277,7 @@ export class State<T extends any = unknown> {
   }
 
   /** @internal */
-  static [Symbol.toStringTag]() {
-    return "State" as const;
-  }
-
-  /** @internal */
-  [Symbol.toStringTag]() {
+  get [Symbol.toStringTag](): "State" {
     return "State" as const;
   }
 
