@@ -2,7 +2,7 @@ import { colors } from "../deps.ts";
 
 const { dim, green, red, yellow } = colors;
 
-export declare enum LogLevel {
+const enum LogLevel {
   Debug = 0,
   Info = 1,
   Warn = 2,
@@ -10,7 +10,7 @@ export declare enum LogLevel {
   Fatal = 4,
 }
 
-export declare type LogLevelName = Lowercase<`${keyof typeof LogLevel}`>;
+declare type LogLevelName = Lowercase<`${keyof typeof LogLevel}`>;
 
 export class Timing {
   #t = performance.now();
