@@ -1,0 +1,22 @@
+image: nberlette/gitpod-enhanced
+
+tasks:
+- init: |
+    export DENO_INSTALL_ROOT="$HOME/.deno/bin"
+    export DENO_DIR="$HOME/.deno/cache"
+    which deno &>/dev/null || curl -fsSL https://deno.land/x/install/install.sh | sh -
+
+vscode:
+  extensions:
+    - denoland.vscode-deno
+    
+github:
+  prebuilds:
+    master: true
+    branches: true
+    pullRequests: true
+    pullRequestsFromForks: true
+    addLabel: true
+    addCheck: true
+    addBadge: true
+    

@@ -1,0 +1,12 @@
+{
+  "imports": {
+    "~/": "./",
+    "@/": "./",
+    "/": "./",
+    "./": "./",
+    "x/": "https://deno.land/x/",
+    "esm/": "https://esm.sh/",
+    "pika/": "https://pika.dev/",
+    "std/": "https://deno.land/std@0.150.0/"
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "importMap": "./import_map.json",
+  "compilerOptions": {
+    "lib": [
+      "deno.ns",
+      "deno.window",
+      "dom.iterable",
+      "dom",
+      "esnext"
+    ],
+    "types": [
+      "./types.d.ts"
+    ],
+    "strict": true,
+    "strictNullChecks": false,
+    "experimentalDecorators": true,
+    "keyofStringsOnly": true
+  },
+  "lint": {
+    "rules": {
+      "exclude": [
+        "no-explicit-any"
+      ]
+    },
+    "files": {
+      "exclude": [
+        ".vscode",
+        ".git*"
+      ]
+    }
+  },
+  "fmt": {
+    "files": {
+      "exclude": [
+        ".vscode",
+        ".git*"
+      ]
+    }
+  }
+}
