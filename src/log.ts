@@ -2,6 +2,16 @@ import { colors } from "../deps.ts";
 
 const { dim, green, red, yellow } = colors;
 
+export declare enum LogLevel {
+  Debug = 0,
+  Info = 1,
+  Warn = 2,
+  Error = 3,
+  Fatal = 4,
+}
+
+export declare type LogLevelName = Lowercase<`${keyof typeof LogLevel}`>;
+
 export class Timing {
   #t = performance.now();
 
@@ -30,22 +40,26 @@ export class Logger {
     return this.#level;
   }
 
+  set level(level: LogLevel) {
+    this.#level = level;
+  }
+
   setLevel(level: LogLevelName): void {
     switch (level) {
       case "debug":
-        this.#level = LogLevel.Debug;
+        this.level = LogLevel.Debug;
         break;
       case "info":
-        this.#level = LogLevel.Info;
+        this.level = LogLevel.Info;
         break;
       case "warn":
-        this.#level = LogLevel.Warn;
+        this.level = LogLevel.Warn;
         break;
       case "error":
-        this.#level = LogLevel.Error;
+        this.level = LogLevel.Error;
         break;
       case "fatal":
-        this.#level = LogLevel.Fatal;
+        this.level = LogLevel.Fatal;
         break;
     }
   }

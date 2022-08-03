@@ -21,12 +21,4 @@ declare type ParamObject = Record<string, string>;
 
 declare type ParamsInit = URLSearchParamsInit;
 
-declare enum LogLevel {
-  Debug = 0,
-  Info = 1,
-  Warn = 2,
-  Error = 3,
-  Fatal = 4,
-}
 
-declare type LogLevelName = Lowercase<`${keyof typeof Level}`>;
