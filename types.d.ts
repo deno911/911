@@ -20,5 +20,3 @@ declare type URLSearchParamsInit =
 declare type ParamObject = Record<string, string>;
 
 declare type ParamsInit = URLSearchParamsInit;
-
-

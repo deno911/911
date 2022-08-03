@@ -9,6 +9,6 @@ export * from "./set.ts";
 export * from "./state.ts";
 export * from "./string.ts";
 export * from "./type.ts";
-export { date, dotenv, is } from "../deps.ts";
+export { assert, date, dotenv, is } from "../deps.ts";
 export { default as case } from "./case.ts";
 export { default as log } from "./log.ts";

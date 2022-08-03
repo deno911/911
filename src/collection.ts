@@ -3,10 +3,14 @@
 /// <reference lib="dom.iterable" />
 /// <reference no-default-lib="true" />
 
-import { collection } from "../deps.ts";
-
-const { chunk, deepMerge, mapEntries, mapKeys, mapValues, mapNotNullish } =
-  collection;
+import {
+  chunk,
+  deepMerge,
+  mapEntries,
+  mapKeys,
+  mapNotNullish,
+  mapValues,
+} from "../deps.ts";
 
 /**
  * Groups an array of objects into a new object, with properties
