@@ -29,8 +29,8 @@ jobs:
     steps:
       - name: "(env) gitconfig"
         run: |
-          git config --system core.autocrlf false
-          git config --system core.eol lf
+          sudo git config --system core.autocrlf false
+          sudo git config --system core.eol lf
 
       - name: "(cache) setup"
         uses: actions/cache@v2
@@ -47,7 +47,7 @@ jobs:
           deno-version: ${{matrix.deno}}
 
       - name: "(cache) reload"
-        run: deno cache --reload --lock=lock.json --lock-write deps.ts
+        run: deno cache --reload --lock=lock.json --lock-write import_map.json
 
       - name: "(run) fmt"
         run: deno fmt --unstable
