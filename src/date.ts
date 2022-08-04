@@ -47,20 +47,20 @@ export function relativeTime(
  * @enum TimePortalUnits
  */
 export enum TimeUnits {
-  millisecond = 1e-3 * TimeUnits.second,
-  microsecond = 1e-6 * TimeUnits.second,
-  nanosecond = 1e-9 * TimeUnits.second,
+  millisecond = 1e-3 * second,
+  microsecond = 1e-6 * second,
+  nanosecond = 1e-9 * second,
   /**
    * set to 1 to scale everything down to seconds. 
    * leave as 1e3 to scale everything as milliseconds.
    */
   second = 1e3,
-  minute = 60 * TimeUnits.second,
-  hour = 3.6e3 * TimeUnits.second,
-  day = 8.64e4 * TimeUnits.second,
-  week = 6.048e5 * TimeUnits.second,
-  month = 2.628e6 * TimeUnits.second,
-  year = 3.1536e7 * TimeUnits.second,
+  minute = 60 * second,
+  hour = 3.6e3 * second,
+  day = 8.64e4 * second,
+  week = 6.048e5 * second,
+  month = 2.628e6 * second,
+  year = 3.1536e7 * second,
 
   millis = millisecond,
   nanos = nanosecond,
