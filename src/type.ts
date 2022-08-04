@@ -1,4 +1,6 @@
-import { is as _is, lowerCase } from "../deps.ts";
+import { lowerCase } from "./case.ts";
+
+export { assert, default as is } from "is";
 
 /**
  * Parses an object's `toStringTag` value.
@@ -18,7 +20,7 @@ export function toStringTag(o: unknown, t?: string): string | boolean {
 /**
  * Check if a value is an object literal / plain object.
  */
-function isObject<T extends Record<any, any>>(
+export function isObject<T extends Record<any, any>>(
   value: T,
 ): value is Record<any, any> {
   return toStringTag(value, "Object");
@@ -27,19 +29,17 @@ function isObject<T extends Record<any, any>>(
 /**
  * Check if a value is an object literal / plain object.
  */
-function isArray(value: unknown): value is any[] {
+export function isArray(value: unknown): value is any[] {
   return Array.isArray(value);
 }
 
-const assert = _is.assert;
-const is = _is.default;
-
-export { assert, is, isArray, isObject };
+export function isArrayLike(value: unknown): value is ArrayLike<any> {
+  return "length" in (value as any) && typeof value !== "function";
+}
 
 export default {
-  is,
-  assert,
   isArray,
+  isArrayLike,
   isObject,
   toStringTag,
 };

@@ -1,16 +1,19 @@
-import { colors } from "../deps.ts";
+import { ansi } from "./fmt.ts";
 
-const { dim, green, red, yellow } = colors;
-
-const enum LogLevel {
-  Debug = 0,
-  Info = 1,
-  Warn = 2,
-  Error = 3,
-  Fatal = 4,
+enum LogLevel {
+  Debug,
+  Info,
+  Warn,
+  Error,
+  Fatal,
 }
 
-declare type LogLevelName = Lowercase<`${keyof typeof LogLevel}`>;
+declare type AllCaseVariants<T extends string> =
+  | Lowercase<T>
+  | Capitalize<Lowercase<T>>
+  | Uppercase<T>;
+
+declare type LogLevelName = AllCaseVariants<keyof typeof LogLevel>;
 
 export class Timing {
   #t = performance.now();
@@ -22,13 +25,13 @@ export class Timing {
   stop(message: string) {
     const now = performance.now();
     const d = Math.round(now - this.#t);
-    let cf = green;
+    let cf = ansi.green;
     if (d > 10000) {
-      cf = red;
+      cf = ansi.red;
     } else if (d > 1000) {
-      cf = yellow;
+      cf = ansi.yellow;
     }
-    console.debug(dim("TIMING"), message, "in", cf(d + "ms"));
+    console.debug(ansi.dim("TIMING"), message, "in", cf(d + "ms"));
     this.#t = now;
   }
 }
@@ -36,12 +39,32 @@ export class Timing {
 export class Logger {
   #level: LogLevel = LogLevel.Info;
 
+  readonly #labels = {
+    debug: "DEBUG",
+    info: "INFO",
+    log: "LOG",
+    warn: "WARN",
+    error: "ERROR",
+    fatal: "FATAL",
+  };
+
+  constructor(level?: LogLevel | LogLevelName) {
+    if (level) {
+      this.level = level;
+    }
+    return this;
+  }
+
   get level(): LogLevel {
     return this.#level;
   }
 
-  set level(level: LogLevel) {
-    this.#level = level;
+  set level(level: LogLevel | LogLevelName) {
+    if (typeof level === "string") {
+      this.setLevel(level);
+    } else {
+      this.#level = level;
+    }
   }
 
   setLevel(level: LogLevelName): void {
@@ -66,31 +89,35 @@ export class Logger {
 
   debug(...args: unknown[]): void {
     if (this.#level <= LogLevel.Debug) {
-      console.debug(dim("DEBUG"), ...args);
+      console.debug(ansi.cyan(this.#labels.debug), ...args);
     }
+  }
+
+  log(...args: unknown[]): void {
+    console.log(ansi.dim(this.#labels.log), ...args);
   }
 
   info(...args: unknown[]): void {
     if (this.#level <= LogLevel.Info) {
-      console.log(green("INFO"), ...args);
+      console.log(ansi.green(this.#labels.info), ...args);
     }
   }
 
   warn(...args: unknown[]): void {
     if (this.#level <= LogLevel.Warn) {
-      console.warn(yellow("WARN"), ...args);
+      console.warn(ansi.red(this.#labels.warn), ...args);
     }
   }
 
   error(...args: unknown[]): void {
     if (this.#level <= LogLevel.Error) {
-      console.error(red("ERROR"), ...args);
+      console.error(ansi.red(this.#labels.error), ...args);
     }
   }
 
   fatal(...args: unknown[]): void {
     if (this.#level <= LogLevel.Fatal) {
-      console.error(red("FATAL"), ...args);
+      console.error(ansi.red(ansi.bold(this.#labels.fatal)), ...args);
       Deno.exit(1);
     }
   }
@@ -109,4 +136,4 @@ export class Logger {
   }
 }
 
-export default new Logger();
+export const log = new Logger();
