@@ -1,16 +1,138 @@
-/// <reference lib="esnext" />
-/// <reference lib="dom" />
-/// <reference lib="dom.iterable" />
-/// <reference no-default-lib="true" />
+export * from "./serialize_map.ts";
+export * from "./serialize_set.ts";
 
-import {
-  chunk,
-  deepMerge,
-  mapEntries,
-  mapKeys,
-  mapNotNullish,
-  mapValues,
-} from "../deps.ts";
+// Copyright 2018-2022 the Deno authors. All rights reserved. MIT license.
+// This module is browser compatible.
+export * from "std/collections/aggregate_groups.ts";
+export * from "std/collections/deep_merge.ts";
+export * from "std/collections/distinct.ts";
+export * from "std/collections/distinct_by.ts";
+export * from "std/collections/filter_entries.ts";
+export * from "std/collections/filter_values.ts";
+export * from "std/collections/filter_keys.ts";
+export * from "std/collections/map_entries.ts";
+export * from "std/collections/map_keys.ts";
+export * from "std/collections/map_not_nullish.ts";
+export * from "std/collections/map_values.ts";
+export * from "std/collections/max_by.ts";
+export * from "std/collections/max_of.ts";
+export * from "std/collections/max_with.ts";
+export * from "std/collections/min_by.ts";
+export * from "std/collections/min_of.ts";
+export * from "std/collections/min_with.ts";
+export * from "std/collections/partition.ts";
+export * from "std/collections/sample.ts";
+export * from "std/collections/unzip.ts";
+export * from "std/collections/zip.ts";
+
+/**
+ * Splits the given array into chunks of the given size and returns them
+ *
+ * Example:
+ *
+ * ```ts
+ * import { chunk } from "https://deno.land/x/911/collection.ts";
+ * import { assertEquals } from "https://deno.land/x/911/asserts.ts";
+ *
+ * const words = [ 'lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consetetur', 'sadipscing' ];
+ * const chunks = chunk(words, 3);
+ *
+ * assertEquals(chunks, [
+ *     [ 'lorem', 'ipsum', 'dolor' ],
+ *     [ 'sit', 'amet', 'consetetur' ],
+ *     [ 'sadipscing' ],
+ * ]);
+ * ```
+ */
+export function chunk<T>(array: readonly T[], size: number): T[][] {
+  if (size <= 0 || !Number.isInteger(size)) {
+    throw new RangeError(
+      `Expected size to be an integer greater than 0 but found ${size}`,
+    );
+  }
+
+  if (array.length === 0) {
+    return [];
+  }
+
+  const length = Math.ceil(array.length / size);
+  const ret = Array.from<T[]>({ length });
+
+  let r = 0, w = 0;
+  while (r < array.length) {
+    ret[w] = array.slice(r, r + size);
+    w += r += size, 1;
+  }
+  return ret;
+}
+
+/**
+ * Transforms the given array into a Record, extracting the key of each element using the given selector.
+ * If the selector produces the same key for multiple elements, the latest one will be used (overriding the
+ * ones before it).
+ *
+ * Example:
+ *
+ * ```ts
+ * import { associateBy } from "https://deno.land/x/911/objects.ts"
+ * import { assertEquals } from "https://deno.land/x/911/testing.ts";
+ *
+ * const users = [
+ *     { id: 'a2e', userName: 'Anna' },
+ *     { id: '5f8', userName: 'Arnold' },
+ *     { id: 'd2c', userName: 'Kim' },
+ * ]
+ *
+ * const usersById = associateBy(users, it => it.id)
+ * assertEquals(usersById, {
+ *     'a2e': { id: 'a2e', userName: 'Anna' },
+ *     '5f8': { id: '5f8', userName: 'Arnold' },
+ *     'd2c': { id: 'd2c', userName: 'Kim' },
+ * })
+ * ```
+ */
+export function associateBy<T>(
+  array: readonly T[],
+  selector: (el: T) => string,
+): Record<string, T> {
+  const ret: Record<string, T> = {};
+  for (const element of array) {
+    ret[selector(element)] = element;
+  }
+  return ret;
+}
+
+/**
+ * Builds a new Record using the given array as keys and choosing a value for each
+ * key using the given selector. If any of two pairs would have the same value
+ * the latest on will be used (overriding the ones before it).
+ *
+ * Example:
+ *
+ * ```ts
+ * import { associateWith } from "https://deno.land/std@$STD_VERSION/collections/associate_with.ts"
+ * import { assertEquals } from "https://deno.land/std@$STD_VERSION/testing/asserts.ts";
+ *
+ * const names = [ 'Kim', 'Lara', 'Jonathan' ]
+ * const namesToLength = associateWith(names, it => it.length)
+ *
+ * assertEquals(namesToLength, {
+ *   'Kim': 3,
+ *   'Lara': 4,
+ *   'Jonathan': 8,
+ * })
+ * ```
+ */
+export function associateWith<T>(
+  array: readonly string[],
+  selector: (key: string) => T,
+): Record<string, T> {
+  const ret: Record<string, T> = {};
+  for (const element of array) {
+    ret[element] = selector(element);
+  }
+  return ret;
+}
 
 /**
  * Groups an array of objects into a new object, with properties
@@ -19,7 +141,7 @@ import {
  * @param callbackfn Function that is used to determine group names
  * @returns new object with groups for property names
  */
-function groupBy<U extends any, K extends keyof U>(
+export function groupBy<U extends any, K extends keyof U>(
   array: U[],
   callbackfn: (element: U, index?: K, array?: U[]) => U[K],
   thisArg?: any,
@@ -31,33 +153,109 @@ function groupBy<U extends any, K extends keyof U>(
   ), {} as Record<K, U[]>);
 }
 
+export type SortKeyFn<T> = (keyof T) | ((el: T) => T[keyof T]);
+
+export type SortCompareFn<T> = (...args: [T, T]) => number;
+
 /**
- * Sort an array by a given property key.
+ * Factory for creating comparator functions. The sort collections of objects
  */
-function sortBy<T extends Array<Record<string, any>>, U = T[number]>(
-  key: keyof U,
-): (...args: [U, U]) => number {
-  return (a, b) => (a[key] as any).localeCompare(b[key]);
+export function sortFactory<T extends Record<string, any>>(
+  key: SortKeyFn<T>,
+): SortCompareFn<T> {
+  return function (a, b) {
+    const fn: SortKeyFn<T> = (el) => (
+      typeof key === "function" ? key(el) : el[key]
+    );
+    return (fn.call(fn, a)).localeCompare(fn.call(fn, b));
+  };
 }
 
-export {
-  chunk,
-  deepMerge,
-  groupBy,
-  mapEntries,
-  mapKeys,
-  mapNotNullish,
-  mapValues,
-  sortBy,
-};
+/**
+ * Sort an array of objects by a shared property key.
+ * @param array collection of objects to sort
+ * @param key property
+ * @returns
+ */
+export function sortBy<T extends Record<string, any>>(
+  array: T[],
+  key: SortKeyFn<T>,
+): T[] {
+  return array.sort(sortFactory(key));
+}
 
-export default {
-  groupBy,
-  sortBy,
-  chunk,
-  deepMerge,
-  mapEntries,
-  mapKeys,
-  mapNotNullish,
-  mapValues,
-};
+/**
+ * Returns all distinct elements that appear in any of the given arrays
+ *
+ * Example:
+ *
+ * ```ts
+ * import { union } from "https://deno.land/std@$STD_VERSION/collections/union.ts";
+ * import { assertEquals } from "https://deno.land/std@$STD_VERSION/testing/asserts.ts";
+ *
+ * const soupIngredients = [ 'Pepper', 'Carrots', 'Leek' ]
+ * const saladIngredients = [ 'Carrots', 'Radicchio', 'Pepper' ]
+ * const shoppingList = union(soupIngredients, saladIngredients)
+ *
+ * assertEquals(shoppingList, [ 'Pepper', 'Carrots', 'Leek', 'Radicchio' ])
+ * ```
+ */
+export function union<T>(...arrays: (readonly T[])[]): T[] {
+  const set = new Set<T>();
+  for (const array of arrays) {
+    for (const element of array) {
+      set.add(element);
+    }
+  }
+  return Array.from(set);
+}
+
+/**
+ * Returns all distinct elements that appear at least once in each of the given arrays
+ *
+ * Example:
+ *
+ * ```ts
+ * import { intersect } from "https://deno.land/std@$STD_VERSION/collections/intersect.ts";
+ * import { assertEquals } from "https://deno.land/std@$STD_VERSION/testing/asserts.ts";
+ *
+ * const lisaInterests = [ 'Cooking', 'Music', 'Hiking' ]
+ * const kimInterests = [ 'Music', 'Tennis', 'Cooking' ]
+ * const commonInterests = intersect(lisaInterests, kimInterests)
+ *
+ * assertEquals(commonInterests, [ 'Cooking', 'Music' ])
+ * ```
+ */
+export function intersect<T>(...arrays: (readonly T[])[]): T[] {
+  const [originalHead, ...tail] = arrays;
+  const head = [...new Set(originalHead)];
+  const tailSets = tail.map((it) => new Set(it));
+
+  for (const set of tailSets) {
+    filterInPlace(head, (it) => set.has(it));
+    if (head.length === 0) return head;
+  }
+
+  return head;
+}
+
+/**
+ * Filters the given array, removing all elements that do not match the given predicate
+ * **in place. This means `array` will be modified!**.
+ */
+export function filterInPlace<T>(
+  array: Array<T>,
+  predicate: (el: T) => boolean,
+): Array<T> {
+  let outputIndex = 0;
+
+  for (const cur of array) {
+    if (!predicate(cur)) {
+      continue;
+    }
+    array[outputIndex] = cur;
+    outputIndex += 1;
+  }
+  array.splice(outputIndex);
+  return array;
+}
