@@ -1,8 +1,3 @@
-/// <reference no-default-lib="true" />
-/// <reference lib="esnext" />
-/// <reference lib="dom" />
-/// <reference lib="dom.iterable" />
-
 /**
  * Extends the builtin `Set` interface, adding a `sort` method, getter/setters
  * for `size`, a `toString` method, and a `toJSON` method. Serializes into a
@@ -12,7 +7,7 @@
  * // [1, 2, 3] - serialized into a valid JSON array
  * @example JSON.stringify(new Set([1, 2, 2, 3]));
  * // {} - standard Set does *not* serialize into JSON
- * @see {@link https://doc.deno.land/https://deno.land/x/911/src/set.ts}
+ * @see {@link https://deno.land/x/911/src/serialize_set.ts}
  * @author Nicholas Berlette <https://github.com/nberlette>
  * @license MIT
  */
@@ -43,7 +38,7 @@ export class SerializeSet<T extends any> extends Set<T> {
     return super.size;
   }
 
-  set size(value: number){
+  set size(value: number) {
     let i = 0;
     const values = [...this.values()];
     for (const val of values) {

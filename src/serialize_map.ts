@@ -1,8 +1,3 @@
-/// <reference no-default-lib="true" />
-/// <reference lib="esnext" />
-/// <reference lib="dom" />
-/// <reference lib="dom.iterable" />
-
 /**
  * Custom extended version of the builtin `Map` interface. Serializes into a
  * valid `JSON` object (rather than `{}`, like its simple-minded cousin). Also
@@ -12,7 +7,7 @@
  * // { "1": 3, "2": 4 } - serialized to a valid JSON Object
  * @example JSON.stringify(new Map([['1', 3], ['2', 4]]))
  * // {} - standard Map does *not* serialize to JSON!
- * @see {@link https://doc.deno.land/https://deno.land/x/911/src/map.ts}
+ * @see {@link https://deno.land/x/911/src/serialize_map.ts}
  * @author Nicholas Berlette <https://github.com/nberlette>
  * @license MIT
  */
@@ -23,7 +18,7 @@ export class SerializeMap<T extends any> extends Map<string, T> {
     return super(initial), this;
   }
 
-  get [Symbol.species](): typeof SerializeMap<T> {
+  get [Symbol.species](): typeof SerializeMap {
     return SerializeMap<T>;
   }
 
@@ -63,5 +58,4 @@ export class SerializeMap<T extends any> extends Map<string, T> {
     }
     return this;
   }
-
 }

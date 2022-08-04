@@ -1,0 +1,81 @@
+name: "🦕 Deno Suite"
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+jobs:
+  deno:
+    runs-on: ${{matrix.os}}
+    # Continue in case the canary run does not succeed
+    continue-on-error: ${{matrix.canary}}
+    env:
+      DENO_DIR: .deno-cache
+      CACHE_VERSION: ${{secrets.CACHE_VERSION}}
+    strategy:
+      matrix:
+        os: [ ubuntu-20.04, macos-11, windows-2019 ]
+        deno: [ v1.x ]
+        canary: [ false ]
+        include:
+          - deno: canary
+            os: ubuntu-20.04
+            canary: true
+    steps:
+      - name: "(env) gitconfig"
+        run: |
+          git config --system core.autocrlf false
+          git config --system core.eol lf
+
+      - name: "(cache) setup"
+        uses: actions/cache@v2
+        with:
+          path: ${{ env.DENO_DIR }}
+          key: ${{ env.CACHE_VERSION }}-${{ hashFiles('lock.json') }}
+
+      - name: "(env) checkout"
+        uses: actions/checkout@v3
+
+      - name: "(setup) 🦕 ${{matrix.deno}}"
+        uses: denoland/setup-deno@004814556e37c54a2f6e31384c9e18e983317366
+        with:
+          deno-version: ${{matrix.deno}}
+
+      - name: "(cache) reload"
+        run: deno cache --reload --lock=lock.json --lock-write deps.ts
+
+      - name: "(run) fmt"
+        run: deno fmt --unstable
+
+      - name: "(run) lint"
+        run: deno lint --unstable
+
+      - name: "(run) test"
+        run: deno test -A --unstable --no-check=remote --coverage=cov
+
+      # # Optional: code coverage reporting
+      #
+      # - name: "(run) coverage"
+      #   if: matrix.os == "macos-11"
+      #   run: deno coverage --lcov cov > cov.lcov
+      #
+      # - name: "(push) report -> coveralls.io"
+      #   if: matrix.os == "macos-11"
+      #   uses: coverallsapp/github-action@master
+      #   with:
+      #     github-token: ${{ secrets.GITHUB_TOKEN }}
+      #     path-to-lcov: cov.lcov
+      #
+      # - name: "(push) build artifacts"
+      #   if: matrix.os == "macos-11"
+      #   uses: actions/upload-artifact@v3.1.0
+      #   with:
+      #     name: coverage
+      #     path: cov.lcov
+      #     retention-days: 90
+      #     if-no-files-found: warn
