@@ -82,3 +82,10 @@ export async function eTag(data: any, weak = true): Promise<string> {
   const hash = await sha1(data);
   return weak ? `W/${hash.slice(-1 * WEAK_LENGTH)}` : hash;
 }
+
+export { eTag as etag };
+
+/**
+ * Utilities and helpers
+ */
+export const uuid = () => crypto.randomUUID();
