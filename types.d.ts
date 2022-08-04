@@ -5,7 +5,6 @@
 /// <reference lib="deno.window" />
 /// <reference lib="deno.ns" />
 /// <reference types="./src/index.ts" />
-/// <reference types="./deps.ts" />
 
 declare type Maybe<T extends any> = T | undefined;
 

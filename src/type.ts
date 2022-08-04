@@ -1,6 +1,11 @@
-import { lowerCase } from "./case.ts";
+// @deno-types="https://raw.githubusercontent.com/sindresorhus/is/main/source/types.ts"
+import * as is from "is";
 
-export { assert, default as is } from "is";
+export { is };
+
+import { cases } from "./fmt.ts";
+
+const lowerCase = cases.lower;
 
 /**
  * Parses an object's `toStringTag` value.

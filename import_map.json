@@ -17,5 +17,10 @@
     "http-cache": "https://deno.land/x/httpcache@0.1.2/in_memory.ts",
     "http-cache/": "https://deno.land/x/httpcache@0.1.2/",
     "media_types": "https://deno.land/x/media_types@v2.13.0/mod.ts"
+  },
+  "scopes": {
+    "is": {
+      "node:buffer": "https://deno.land/std@0.150.0/node/buffer.ts"
+    }
   }
 }
