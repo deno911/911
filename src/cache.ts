@@ -1,7 +1,16 @@
 import { inMemoryCache } from "http-cache";
 
-import { CACHE_CAPACITY } from "./constants.ts";
+const cache = {};
 
-export { globalCache, inMemoryCache };
+export * from "http-cache";
 
-const globalCache = inMemoryCache(CACHE_CAPACITY);
+const CACHE_CAPACITY = 20;
+
+const globalCacheKey = Symbol.for("deno911");
+
+export function createCache(capacity = CACHE_CAPACITY, id = globalCacheKey) {
+  cache[id] ??= inMemoryCache(capacity);
+  return cache[id];
+}
+
+export const globalCache = createCache();
