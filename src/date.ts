@@ -14,6 +14,34 @@ export {
 } from "std/datetime/mod.ts";
 
 /**
+ * @param value number to format to a relative string
+ * @param unit relative units of time (e.g. `"days"`, `"hours"`, etc.)
+ * @param options configure the behavior of the time formatting API
+ * @returns
+ */
+export function relativeTime(
+  value: number,
+  unit: Intl.RelativeTimeFormatUnit,
+  {
+    style = "long",
+    numeric = "auto",
+    locales = "en",
+    localeMatcher = "best fit",
+  }: Intl.RelativeTimeFormatOptions & { locales?: string | string[] } = {},
+): string {
+  try {
+    return new Intl.RelativeTimeFormat(locales, {
+      style,
+      numeric,
+      localeMatcher,
+    }).format(value, unit);
+  } catch (e) {
+    log.error(e);
+    return "";
+  }
+}
+
+/**
  * Maps human-readable time measurement names to their numeric values.
  * (in scientific notation)
  * @enum TimePortalUnits
@@ -121,49 +149,17 @@ export const NANOSECOND = TimeUnits.ns;
  */
 export const MICROSECOND = TimeUnits.us;
 
+// shorthand aliases
 export {
-  DAY,
   DAY as DY,
-  HOUR,
   HOUR as HR,
   MICROSECOND as US,
   MILLISECOND as MS,
-  MINUTE,
   MINUTE as MIN,
   MONTH as MO,
   NANOSECOND as NS,
   QUARTER as QR,
-  SECOND,
   SECOND as SEC,
-  WEEK,
   WEEK as WK,
   YEAR as YR,
 };
-
-/**
- * @param value number to format to a relative string
- * @param unit relative units of time (e.g. `"days"`, `"hours"`, etc.)
- * @param options configure the behavior of the time formatting API
- * @returns
- */
-export function relativeTime(
-  value: number,
-  unit: Intl.RelativeTimeFormatUnit,
-  {
-    style = "long",
-    numeric = "auto",
-    locales = "en",
-    localeMatcher = "best fit",
-  }: Intl.RelativeTimeFormatOptions & { locales?: string | string[] } = {},
-): string {
-  try {
-    return new Intl.RelativeTimeFormat(locales, {
-      style,
-      numeric,
-      localeMatcher,
-    }).format(value, unit);
-  } catch (e) {
-    log.error(e);
-    return "";
-  }
-}
