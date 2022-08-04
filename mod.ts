@@ -1,7 +1,6 @@
 /// <reference no-default-lib="true" />
 
 export * as collection from "./src/collection.ts";
-export * as constants from "./src/constants.ts";
 export * as date from "./src/date.ts";
 export * as env from "./src/env.ts";
 export * as fmt from "./src/fmt.ts";
