@@ -7,3 +7,5 @@ Thumbs.db
 .*swp
 .*.save
 *.save
+cov
+node_modules
