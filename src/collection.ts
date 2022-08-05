@@ -154,7 +154,6 @@ export function groupBy<U extends any, K extends keyof U>(
 }
 
 export type SortKeyFn<T> = (keyof T) | ((el: T) => T[keyof T]);
-
 export type SortCompareFn<T> = (...args: [T, T]) => number;
 
 /**
@@ -172,16 +171,31 @@ export function sortFactory<T extends Record<string, any>>(
 }
 
 /**
- * Sort an array of objects by a shared property key.
+ * Sort an array of objects by a shared property key. Mutates the array.
+ *
  * @param array collection of objects to sort
  * @param key property
- * @returns
+ * @returns reference to the same array
+ */
+export function sortInPlace<T extends Record<string, any>>(
+  array: T[],
+  key: SortKeyFn<T>,
+): T[] {
+  return array.sort(sortFactory(key));
+}
+
+/**
+ * Sort an array of objects by a shared property key.
+ *
+ * @param array collection of objects to sort
+ * @param key property
+ * @returns a copy of the source array, with sorted values
  */
 export function sortBy<T extends Record<string, any>>(
   array: T[],
   key: SortKeyFn<T>,
 ): T[] {
-  return array.sort(sortFactory(key));
+  return [...array].sort(sortFactory(key));
 }
 
 /**
@@ -258,4 +272,74 @@ export function filterInPlace<T>(
   }
   array.splice(outputIndex);
   return array;
+}
+
+/**
+ * Copy the values of all of the enumerable own properties from one or more source objects to a
+ * target object. Returns the target object.
+ * @param target The target object to copy to.
+ * @param source The first source object from which to copy properties.
+ */
+export function assign<T extends {}, U>(target: T, source: U): asserts target is T & U
+
+/**
+ * Copy the values of all of the enumerable own properties from one or more source objects to a
+ * target object. Returns the target object.
+ * @param target The target object to copy to.
+ * @param source1 The first source object from which to copy properties.
+ * @param source2 The second source object from which to copy properties.
+ */
+export function assign<T extends {}, U, V>(target: T, source1: U, source2: V): asserts target is T & U & V
+/**
+ * Copy the values of all of the enumerable own properties from one or more source objects to a
+ * target object. Returns the target object.
+ * @param target The target object to copy to.
+ * @param source1 The first source object from which to copy properties.
+ * @param source2 The second source object from which to copy properties.
+ * @param source3 The third source object from which to copy properties.
+ */
+export function assign<T extends {}, U, V, W>(
+  target: T,
+  source1: U,
+  source2: V,
+  source3: W,
+): asserts target is T & U & V & W
+
+/**
+ * Copy the values of all of the enumerable own properties from one or more source objects to a
+ * target object. Returns the target object.
+ * @param target The target object to copy to.
+ * @param sources One or more source objects from which to copy properties
+ */
+export function assign<T extends {}, U>(
+  target: T,
+  ...sources: U[]
+): asserts target is T & keyof typeof sources
+
+export function assign(target: object, ...sources: any[]) {
+  if (sources != null)
+    Object.assign(target, ...sources)
+}
+
+/**
+ * Construct a new object containing only the given keys of another object.
+ * @param o the original object to inherit from
+ * @param keys the list of properties to copy to the new object
+ * @returns a new object
+ *
+ * @example ```ts
+ * const obj1 = { a: 1, b: 4, c: 8 };
+ * const obj2 = pick(obj1, ["a", "c"]);
+ * // { a: 1, c: 8 }
+ * ```
+ */
+export function pick<
+  T extends any,
+  K extends (keyof T & string)
+>(o: T, keys: K[]): Record<K, T[K]> {
+  keys = keys.map(key => lowerCase((k as string)).trim() as K);
+  return filterEntries<any>(
+    Object.assign<T>({} as T, (isObject(o) ? o : {} as T)),
+    ([k, v]: [K, T[K]]) => (keys as string[]).includes(k),
+  ) as Record<K, T[K]>
 }
