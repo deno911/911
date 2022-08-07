@@ -1,22 +1,24 @@
 import {
   camelCase,
   constantCase,
-  constantCase as constCase,
+  constCase,
+  kebabCase,
   lowerCase,
   paramCase,
-  paramCase as kebabCase,
   pascalCase,
   sentenceCase,
   snakeCase,
   titleCase,
   upperCase,
-} from "case";
+} from "../deps.ts";
 
-export * as ansi from "std/fmt/colors.ts";
-
-export { prettyBytes, type PrettyBytesOptions } from "std/fmt/bytes.ts";
-
-export { printf, sprintf } from "std/fmt/printf.ts";
+export {
+  ansi,
+  prettyBytes,
+  type PrettyBytesOptions,
+  printf,
+  sprintf,
+} from "../deps.ts";
 
 export {
   camelCase,

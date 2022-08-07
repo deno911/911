@@ -47,14 +47,14 @@ export function relativeTime(
  * @enum TimePortalUnits
  */
 export enum TimeUnits {
-  millisecond = 1e-3 * second,
-  microsecond = 1e-6 * second,
-  nanosecond = 1e-9 * second,
   /**
-   * set to 1 to scale everything down to seconds. 
+   * set to 1 to scale everything down to seconds.
    * leave as 1e3 to scale everything as milliseconds.
    */
   second = 1e3,
+  millisecond = 1e-3 * second,
+  microsecond = 1e-6 * second,
+  nanosecond = 1e-9 * second,
   minute = 60 * second,
   hour = 3.6e3 * second,
   day = 8.64e4 * second,
@@ -147,7 +147,6 @@ export const DECADE = TimeUnits.year * 10;
  * 100 years in seconds.
  */
 export const CENTURY = TimeUnits.year * 100;
-
 
 // shorthand aliases
 export {

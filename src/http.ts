@@ -3,35 +3,29 @@
 /// <reference lib="dom.iterable" />
 /// <reference lib="dom.asynciterable" />
 /// <reference lib="deno.ns" />
-/// <reference types="preact" />
-/// <reference types="preact-render-to-string" />
-/// <reference types="https://x.lcas.dev/preact@10.5.12/mod.d.ts" />
 
-import {
-  type ConnInfo,
-  serve as std_serve,
-  type ServeInit,
-} from "std/http/server.ts";
+import { type ConnInfo, serve as std_serve, type ServeInit } from "../deps.ts";
 
 import { log } from "./log.ts";
-import { contentType as getContentType } from "std/media_types/mod.ts";
-import * as path from "std/path/mod.ts";
-import { Status, STATUS_TEXT as _STATUS_TEXT } from "std/http/http_status.ts";
 import { globalCache } from "./cache.ts";
 import { json } from "./json.ts";
 import { etag } from "./hash.ts";
-import type { VNode } from "https://x.lcas.dev/preact@10.5.12/mod.d.ts";
-import { render as renderToString } from "preact-render-to-string";
+export * from "./json.ts";
+
+import {
+  getContentType,
+  path,
+  renderToString,
+  Status,
+  STATUS_TEXT as _STATUS_TEXT,
+  type VNode,
+} from "../deps.ts";
 
 const STATUS_TEXT = new Map<string, any>(Object.entries(_STATUS_TEXT));
 
 export { renderToString, Status, STATUS_TEXT };
-export * from "preact";
+
 export * from "./json.ts";
-export * from "std/http/server.ts";
-export * from "std/http/http_errors.ts";
-export * from "std/http/util.ts";
-export * from "std/http/cookie.ts";
 
 declare type PathParams = Record<string, string> | undefined;
 
