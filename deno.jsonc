@@ -19,7 +19,10 @@
   "lint": {
     "rules": {
       "exclude": [
-        "no-explicit-any"
+        "no-explicit-any",
+        "ban-types",
+        "ban-ts-comment",
+        "no-unused-vars"
       ]
     },
     "files": {
@@ -36,5 +39,10 @@
         ".git*"
       ]
     }
+  },
+  "tasks": {
+    "fmtlint": "deno fmt && deno lint --unstable",
+    "prepare": "deno install -A -f -n land https://deno.land/x/land@v0.9.3/cli.ts",
+    "release": "which land >/dev/null || deno task prepare; deno task fmtlint && land publish -A;"
   }
 }

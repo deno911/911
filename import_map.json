@@ -1,26 +1,20 @@
 {
   "imports": {
+    "./": "./",
     "~/": "./",
     "@/": "./",
     "/": "./",
-    "./": "./",
     "x/": "https://deno.land/x/",
     "esm/": "https://esm.sh/",
     "pika/": "https://pika.dev/",
-    "std/": "https://deno.land/std@0.150.0/",
+    "std/": "https://deno.land/std@0.151.0/",
+    "fmt/": "https://deno.land/std@0.151.0/fmt/",
     "case": "https://deno.land/x/case@2.1.1/mod.ts",
     "case/": "https://deno.land/x/case@2.1.1/",
-    "is": "https://raw.githubusercontent.com/sindresorhus/is/main/source/index.ts",
-    "is/": "https://raw.githubusercontent.com/sindresorhus/is/main/source/",
     "preact": "https://esm.sh/v89/preact@10.10.0/deno/preact.js",
     "preact-render-to-string": "https://esm.sh/v89/preact-render-to-string@5.2.1/X-ZS9wcmVhY3Q/deno/preact-render-to-string.js",
     "http-cache": "https://deno.land/x/httpcache@0.1.2/in_memory.ts",
     "http-cache/": "https://deno.land/x/httpcache@0.1.2/",
     "media_types": "https://deno.land/x/media_types@v2.13.0/mod.ts"
-  },
-  "scopes": {
-    "is": {
-      "node:buffer": "https://deno.land/std@0.150.0/node/buffer.ts"
-    }
   }
 }
