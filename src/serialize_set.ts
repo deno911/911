@@ -12,18 +12,16 @@
  * @license MIT
  */
 export class SerializeSet<T extends any> extends Set<T> {
-  constructor(values?: readonly T[]);
-  constructor(initial?: Iterable<T>);
-  constructor(initial?: any) {
-    return super(initial), this;
-  }
-
   get [Symbol.toStringTag](): "SerializeSet" {
     return "SerializeSet" as const;
   }
 
   [Symbol.toPrimitive](hint: "string" | "number" | "default"): string | number {
-    return hint === "number" ? this.size! : this.toString();
+    return hint === "number"
+      ? this.size!
+      : hint === "string"
+      ? this.toString()
+      : this.toJSON().toString();
   }
 
   toJSON(): T[] {
@@ -40,16 +38,16 @@ export class SerializeSet<T extends any> extends Set<T> {
 
   set size(value: number) {
     let i = 0;
-    const values = [...this.values()];
-    for (const val of values) {
-      i >= value && this.delete(val), i++;
+    for (const v of this.values()) {
+      i >= value && this.delete(v), i++;
     }
   }
 
   sort(desc = false): SerializeSet<T> {
-    const values = [...new SerializeSet(this).values()].sort();
+    const values = [...this.values()].sort();
+    desc && values.reverse();
     this.clear();
-    for (const value of (desc && values.reverse(), values)) {
+    for (const value of values) {
       this.add(value);
     }
     return this;

@@ -3,10 +3,27 @@
  * valid `JSON` object (rather than `{}`, like its simple-minded cousin). Also
  * adds a `sort` method, getter/setters for `size`, a `toString` method, and
  * some internal Symbol properties.
- * @example JSON.stringify(new SerializeMap([['1', 3], ['2', 4]]))
- * // { "1": 3, "2": 4 } - serialized to a valid JSON Object
- * @example JSON.stringify(new Map([['1', 3], ['2', 4]]))
- * // {} - standard Map does *not* serialize to JSON!
+ * @example ```ts
+ * import { SerializeMap } from "./serialize_map.ts";
+ *
+ * const bad = new Map([
+ *  ["1", "one"],
+ *  ["2", "two"],
+ *  ["3", "three"]
+ * ]);
+ *
+ * JSON.stringify(bad);
+ * // {}
+ * // (standard Map does *not* serialize into JSON)
+ *
+ * // we can re-initialize a standard Map to a SerializeMap
+ * const good = new SerializeMap(bad);
+ *
+ * JSON.stringify(good);
+ * // { "1": "one", "2": "two", "3": "three" }
+ * // (serialized into a valid JSON object)
+ *
+ * ```
  * @see {@link https://deno.land/x/911/src/serialize_map.ts}
  * @author Nicholas Berlette <https://github.com/nberlette>
  * @license MIT
