@@ -40,6 +40,19 @@ export {
 
 export * from "https://deno.land/x/case@2.1.1/mod.ts";
 
+export {
+  dayOfYear,
+  difference,
+  type DifferenceFormat,
+  type DifferenceOptions,
+  format,
+  isLeap,
+  parse,
+  toIMF,
+  type Unit,
+  weekOfYear,
+} from "https://deno.land/std@0.151.0/datetime/mod.ts";
+
 // dotenv
 export { config as dotenv } from "https://deno.land/std@0.151.0/dotenv/mod.ts";
 
@@ -64,5 +77,5 @@ export { render as renderToString } from "https://esm.sh/preact-render-to-string
 
 // docs
 export { doc } from "https://deno.land/x/deno_doc@0.39.0/mod.ts";
-export * from "https://deno.land/x/deno_doc_components@0.1.1/doc.ts";
+// export * from "https://deno.land/x/deno_doc_components@0.1.1/doc.ts";
 export * from "https://deno.land/x/deno_doc@0.39.0/lib/types.d.ts";
