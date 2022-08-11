@@ -1,4 +1,4 @@
-import { remove } from "./array.ts";
+import { remove } from "./collection.ts";
 import { pLimit } from "../deps.ts";
 
 /**
@@ -55,12 +55,12 @@ export interface ControlledPromise<T = void> extends Promise<T> {
  *
  * @category Promise
  * @example
- * ```
+ * ```ts
  * const promise = createControlledPromise()
  *
  * await promise
  *
- * // in anther context:
+ * // in another context:
  * promise.resolve(data)
  * ```
  */
