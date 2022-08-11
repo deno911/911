@@ -2,11 +2,10 @@
 /// <reference lib="deno.ns" />
 /// <reference lib="esnext" />
 
-import {
-  assertEquals,
-  assertInstanceOf,
-} from "https://deno.land/std@0.151.0/testing/asserts.ts";
+import { assertEquals, assertInstanceOf } from "../deps_test.ts";
 import { SerializeSet } from "./serialize_set.ts";
+
+const init = () => new SerializeSet([1, 1, 2, 3]);
 
 const tests = (<Deno.TestDefinition[]> [
   {
@@ -14,16 +13,23 @@ const tests = (<Deno.TestDefinition[]> [
     async fn(ctx) {
       const steps = (<Deno.TestStepDefinition[]> [
         {
+          name: "instanceof SerializeSet",
+          fn() {
+            const set = init();
+            assertInstanceOf(set, SerializeSet<number>);
+          },
+        },
+        {
           name: "Symbol.toStringTag()",
           fn() {
-            const set = new SerializeSet([1, 1, 2, 3]);
+            const set = init();
             assertEquals({}.toString.call(set), "[object SerializeSet]");
           },
         },
         {
           name: "Symbol.iterator()",
           fn() {
-            const set = new SerializeSet([1, 1, 2, 3]);
+            const set = init();
             const iterator = set[Symbol.iterator]();
             assertEquals(iterator.next().value, 1);
             assertEquals(iterator.next().value, 2);
@@ -41,21 +47,21 @@ const tests = (<Deno.TestDefinition[]> [
         {
           name: "Symbol.toPrimitive(number)",
           fn() {
-            const set = new SerializeSet([1, 1, 2, 3]);
+            const set = init();
             assertEquals(+set, set.size);
           },
         },
         {
           name: "Symbol.toPrimitive(string)",
           fn() {
-            const set = new SerializeSet([1, 1, 2, 3]);
+            const set = init();
             assertEquals(`${set}`, "[1,2,3]");
           },
         },
         {
           name: "Symbol.toPrimitive(default)",
           fn() {
-            const set = new SerializeSet([1, 1, 2, 3]);
+            const set = init();
             assertEquals(set + "", "1,2,3");
           },
         },
@@ -70,7 +76,7 @@ const tests = (<Deno.TestDefinition[]> [
         {
           name: ".add().sort().toJSON()",
           fn() {
-            const set = new SerializeSet([1, 1, 2, 3]).add(4).sort(true)
+            const set = init().add(4).sort(true)
               .toJSON();
             assertEquals(set, [4, 3, 2, 1]);
           },
@@ -88,7 +94,7 @@ const tests = (<Deno.TestDefinition[]> [
         {
           name: ".delete()",
           fn() {
-            const set = new SerializeSet([1, 1, 2, 3]);
+            const set = init();
             assertEquals(set.size, 3);
             set.delete(1);
             assertEquals(set.size, 2);
@@ -97,7 +103,7 @@ const tests = (<Deno.TestDefinition[]> [
         {
           name: ".has()",
           fn() {
-            const set = new SerializeSet([1, 1, 2, 3]);
+            const set = init();
             assertEquals(set.has(1), true);
             assertEquals(set.has(4), false);
           },
@@ -105,7 +111,7 @@ const tests = (<Deno.TestDefinition[]> [
         {
           name: ".clear()",
           fn() {
-            const set = new SerializeSet([1, 1, 2, 3]);
+            const set = init();
             assertEquals(set.size, 3);
             set.clear();
             assertEquals(set.size, 0);
@@ -114,7 +120,7 @@ const tests = (<Deno.TestDefinition[]> [
         {
           name: ".keys()",
           fn() {
-            const set = new SerializeSet([1, 1, 2, 3]);
+            const set = init();
             const keys = set.keys();
             assertEquals(keys.next().value, 1);
             assertEquals(keys.next().value, 2);
@@ -125,7 +131,7 @@ const tests = (<Deno.TestDefinition[]> [
         {
           name: ".values()",
           fn() {
-            const set = new SerializeSet([1, 1, 2, 3]);
+            const set = init();
             const values = set.values();
             assertEquals(values.next().value, 1);
             assertEquals(values.next().value, 2);
@@ -136,7 +142,7 @@ const tests = (<Deno.TestDefinition[]> [
         {
           name: ".entries()",
           fn() {
-            const set = new SerializeSet([1, 1, 2, 3]);
+            const set = init();
             const entries = set.entries();
             assertEquals(entries.next().value, [1, 1]);
             assertEquals(entries.next().value, [2, 2]);
@@ -149,7 +155,7 @@ const tests = (<Deno.TestDefinition[]> [
           async fn(ctx) {
             await ctx.step({
               name: "ascending",
-              fn(t) {
+              fn() {
                 const set = new SerializeSet([5, 2, 6, 8, 4, 1, 3, 2, 7, 6, 3]);
                 set.sort();
                 assertEquals(set.toJSON(), [1, 2, 3, 4, 5, 6, 7, 8]);
@@ -168,7 +174,7 @@ const tests = (<Deno.TestDefinition[]> [
         {
           name: ".toJSON()",
           fn() {
-            const set = new SerializeSet([1, 1, 2, 3]);
+            const set = init();
             assertEquals(set.toJSON(), [1, 2, 3]);
             assertEquals(JSON.stringify(set), "[1,2,3]");
           },
@@ -177,12 +183,12 @@ const tests = (<Deno.TestDefinition[]> [
           name: ".size",
           async fn(ctx) {
             await ctx.step("getter", () => {
-              const set = new SerializeSet([1, 1, 2, 3]);
+              const set = init();
               assertEquals(set.size, 3);
             });
             await ctx.step("setter", () => {
-              const set = new SerializeSet([1, 1, 2, 3, 3, 4]);
-              assertEquals(set.size, 4);
+              const set = init();
+              assertEquals(set.size, 3);
               set.size = 2;
               assertEquals(set.size, 2);
             });

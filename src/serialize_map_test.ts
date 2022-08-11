@@ -2,14 +2,10 @@
 /// <reference lib="deno.ns" />
 /// <reference lib="esnext" />
 
-import {
-  assertEquals,
-  assertInstanceOf,
-} from "https://deno.land/std@0.151.0/testing/asserts.ts";
-
+import { assertEquals, assertInstanceOf } from "../deps_test.ts";
 import { SerializeMap } from "./serialize_map.ts";
 
-const initMap = () =>
+const init = () =>
   new SerializeMap([
     ["1", "one"],
     ["2", "two"],
@@ -22,20 +18,23 @@ const tests = (<Deno.TestDefinition[]> [
     async fn(ctx) {
       const steps = (<Deno.TestStepDefinition[]> [
         {
+          name: "instanceof SerializeMap",
+          fn() {
+            const map = init();
+            assertInstanceOf(map, SerializeMap<string>);
+          },
+        },
+        {
           name: "Symbol.toStringTag()",
           fn() {
-            const map = new SerializeMap([
-              ["1", "one"],
-              ["2", "two"],
-              ["3", "three"],
-            ]);
+            const map = init();
             assertEquals({}.toString.call(map), "[object SerializeMap]");
           },
         },
         {
           name: "Symbol.iterator()",
           fn() {
-            const map = initMap();
+            const map = init();
             const iterator = map[Symbol.iterator]();
             assertEquals(iterator.next().value, ["1", "one"]);
             assertEquals(iterator.next().value, ["2", "two"]);
@@ -53,14 +52,14 @@ const tests = (<Deno.TestDefinition[]> [
         {
           name: "Symbol.toPrimitive(number)",
           fn() {
-            const map = initMap();
+            const map = init();
             assertEquals(+map, map.size);
           },
         },
         {
           name: "Symbol.toPrimitive(string)",
           fn() {
-            const map = initMap();
+            const map = init();
             assertEquals(`${map}`, '{"1":"one","2":"two","3":"three"}');
           },
         },
@@ -95,14 +94,14 @@ const tests = (<Deno.TestDefinition[]> [
         {
           name: ".get()",
           fn() {
-            const map = initMap();
+            const map = init();
             assertEquals(map.get("1"), "one");
           },
         },
         {
           name: ".delete()",
           fn() {
-            const map = initMap();
+            const map = init();
             assertEquals(map.size, 3);
             map.delete("1");
             assertEquals(map.size, 2);
@@ -111,7 +110,7 @@ const tests = (<Deno.TestDefinition[]> [
         {
           name: ".has()",
           fn() {
-            const map = initMap();
+            const map = init();
             assertEquals(map.has("1"), true);
             assertEquals(map.has("4"), false);
           },
@@ -119,7 +118,7 @@ const tests = (<Deno.TestDefinition[]> [
         {
           name: ".clear()",
           fn() {
-            const map = initMap();
+            const map = init();
             assertEquals(map.size, 3);
             map.clear();
             assertEquals(map.size, 0);
@@ -128,7 +127,7 @@ const tests = (<Deno.TestDefinition[]> [
         {
           name: ".keys()",
           fn() {
-            const map = initMap();
+            const map = init();
             const keys = map.keys();
             assertEquals(keys.next().value, "1");
             assertEquals(keys.next().value, "2");
@@ -139,7 +138,7 @@ const tests = (<Deno.TestDefinition[]> [
         {
           name: ".values()",
           fn() {
-            const map = initMap();
+            const map = init();
             const values = map.values();
             assertEquals(values.next().value, "one");
             assertEquals(values.next().value, "two");
@@ -150,7 +149,7 @@ const tests = (<Deno.TestDefinition[]> [
         {
           name: ".entries()",
           fn() {
-            const map = initMap();
+            const map = init();
             const entries = map.entries();
             assertEquals(entries.next().value, ["1", "one"]);
             assertEquals(entries.next().value, ["2", "two"]);
@@ -164,7 +163,7 @@ const tests = (<Deno.TestDefinition[]> [
             await ctx.step({
               name: "ascending",
               fn(t) {
-                const map = initMap();
+                const map = init();
                 map.sort();
                 assertEquals(map.toJSON(), {
                   "1": "one",
@@ -176,7 +175,7 @@ const tests = (<Deno.TestDefinition[]> [
             await ctx.step({
               name: "descending",
               fn() {
-                const map = initMap();
+                const map = init();
                 map.sort(true);
                 assertEquals(map.toJSON(), {
                   "3": "three",
@@ -190,7 +189,7 @@ const tests = (<Deno.TestDefinition[]> [
         {
           name: ".toJSON()",
           fn() {
-            const map = initMap();
+            const map = init();
             assertEquals(map.toJSON(), {
               "1": "one",
               "2": "two",
@@ -206,11 +205,11 @@ const tests = (<Deno.TestDefinition[]> [
           name: ".size",
           async fn(ctx) {
             await ctx.step("getter", () => {
-              const map = initMap();
+              const map = init();
               assertEquals(map.size, 3);
             });
             await ctx.step("setter", () => {
-              const map = initMap();
+              const map = init();
               assertEquals(map.size, 3);
               map.size = 2;
               assertEquals(map.size, 2);
