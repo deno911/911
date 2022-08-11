@@ -175,13 +175,14 @@ export interface ServeStaticOptions {
   cache?: boolean;
 }
 
-/** Serve static files hosted on the internet or relative to your source code.
+/**
+ * Serve static files hosted on the internet or relative to your source code.
  *
  * Be default, up to 20 static assets that are less than 10MB are cached. You
  * can disable caching by setting `cache: false` in the options object.
  *
  * @example
- * ```
+ * ```ts
  * import { serve, serveStatic } from "https://deno.land/x/sift/mod.ts"
  *
  * serve({

@@ -13,12 +13,13 @@ export const utf8TextDecoder = new TextDecoder();
  * @param buffer
  * @returns
  */
-export function toHex(buffer: Uint8Array | ArrayBuffer) {
-  const bytes = (buffer instanceof Uint8Array)
-    ? buffer
-    : new Uint8Array(buffer);
-  return [...bytes].map((b) => b.toString(16).padStart(2, "0")).join("");
-}
+export const toHex = (
+  (buffer: Uint8Array | ArrayBuffer) =>
+    Array.from(
+      buffer instanceof Uint8Array ? buffer : new Uint8Array(buffer),
+      (b) => b.toString(16).padStart(2, "0"),
+    ).join("")
+);
 
 /**
  * Generate a hash of a dataset using the specified crypto algorithm.

@@ -34,15 +34,10 @@ export {
   upperCase,
 };
 
-/**
- * Case manipulation utilities for strings.
- * @example import { case } from "https://deno.land/x/911/mod.ts";
- * case.title("hello wOrLd lol");
- * // Hello World Lol
- */
 export const cases = {
   /**
-   * Convert a string to title case - capitalized words, separated by ` ` (space).
+   * Case manipulation utilities for strings.
+   * ? by ` ` (space).
    * @example _.titleCase("hello_world")
    * // Hello World
    */
@@ -135,4 +130,112 @@ export function slugify(str: string): string {
   return kebabCase(str)
     .replace(/[^a-z0-9-]+|[-]+/ig, "-")
     .replace(/^[-]+|[-]+$/g, "");
+}
+
+export type Template = string;
+export type Values<
+  K extends string = string,
+  V = string | ((...args: string[]) => string),
+> =
+  | { [P in K]: V }
+  | [K, V][]
+  | V[];
+
+export class Templette {
+  #template = "";
+
+  /**
+   * Construct a new Templette instance from a template string.
+   *
+   * @param {Template} template - the raw template string we render with
+   */
+  constructor(template: Template) {
+    this.template = template;
+    return this;
+  }
+
+  /**
+   * Render the template with provided values.
+   *
+   * @param {Values} values
+   * @returns {string}
+   */
+  render(values: Values): string {
+    return Templette.compile(this.template, values);
+  }
+
+  /**
+   * Templette's main compile method, powered by JavaScript's powerful builtin RegExp engine.
+   *
+   * @example Templette.compile ('Hello {{name}}!', { name: 'Nick' })
+   * // Hello Nick!
+   * @param {Template} template - the raw template string we want to compile
+   * @param {Values} values - substitutions to make, either as a generic list (for numbered keys), or as a map-style object to replace named keys or deep (dot-notation) paths.
+   * @return {string}
+   */
+  compile(template: Template, values: Values): string {
+    return Templette.compile(template, values);
+  }
+
+  /**
+   * Templette's main compile method, powered by JavaScript's powerful builtin RegExp engine.
+   *
+   * @example Templette.compile ('Hello {{name}}!', { name: 'Nick' })
+   * // Hello Nick!
+   * @param {string} template - the raw template string we want to compile
+   * @param {Values} values - substitutions to make, either as a generic list (for numbered keys), or as a map-style object to replace named keys or deep (dot-notation) paths.
+   * @return {string}
+   */
+  static compile(template: string, values: Values): string {
+    return template.replace(
+      /[{]{1,3}\s*(.*?)\s*[}]{1,3}/g,
+      (x: string | number, key: string | any, y: any) => {
+        (x = 0), (y = values);
+        key = key.trim().split(".");
+        while (y && x < key.length) {
+          y = y[key[x++]];
+        }
+        return y != null ? y : "";
+      },
+    );
+  }
+
+  /**
+   * Cleanup a template string and remove some inconsistencies.
+   * @param {string} template raw unformatted template string
+   * @param {Record<string, unknown>} [substitutions] optional map of substitutions to make: each property name is the search pattern or string, and its value is the replacement string or function.
+   * @returns {string} formatted and normalized template string
+   */
+  static cleanup(
+    template: string,
+    substitutions?: [string | RegExp, any][],
+  ): string {
+    substitutions = substitutions || [[
+      /[{]{1}[\s ]?([\S]+)[\s ]?[}]{1}/g,
+      (_m0: string, m1: string) => `{{${m1}}}`,
+    ]];
+    return substitutions.reduce(
+      (t, [s, r]) => `${t}`.replace(s, r),
+      String.prototype.toString.call(template),
+    );
+  }
+
+  /**
+   * Getter method for `.template` on instances of `Templette` that were constructed
+   * using the `new Templette()` constructor method.
+   * @example const t = new Templette();
+   * console.log(t.template);
+   * // null
+   */
+  get template() {
+    return this.#template ?? null;
+  }
+
+  /**
+   * Instance-level setter method for the `new Templette().template` property.
+   * @param {string} str the template value to set
+   */
+  set template(str: string) {
+    if (str) this.#template = Templette.cleanup(str);
+  }
 }
