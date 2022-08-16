@@ -212,7 +212,7 @@ export function range(...args: any): number[] {
  * @param from
  * @param to
  */
-export function move<T>(arr: T[], from: number, to: number) {
+export function move<T>(arr: T[], from: number, to: number): T[] {
   arr.splice(to, 0, arr.splice(from, 1)[0]);
   return arr;
 }
@@ -301,7 +301,7 @@ export type Maybe<T> = T | null | undefined;
  * @see https://eslint.org/docs/rules/no-prototype-builtins
  * @category Object
  */
-export function hasOwnProperty<T>(obj: T, v: PropertyKey) {
+export function hasOwnProperty<T>(obj: T, v: PropertyKey): boolean {
   if (obj == null) {
     return false;
   }
@@ -325,7 +325,7 @@ export function isKeyOf<T extends object>(obj: T, k: keyof any): k is keyof T {
  *
  * @category Object
  */
-export function objectKeys<T extends object>(obj: T) {
+export function objectKeys<T extends object>(obj: T): Array<keyof T> {
   return Object.keys(obj) as Array<keyof T>;
 }
 
@@ -334,28 +334,11 @@ export function objectKeys<T extends object>(obj: T) {
  *
  * @category Object
  */
-export function objectEntries<T extends Record<string, any>>(obj: T) {
+export function objectEntries<T extends Record<string, any>>(
+  obj: T,
+): Array<[string, any]> {
   return Object.entries<T[keyof T]>(obj);
 }
-
-// export function pluckDeep<R extends Record<string, unknown>, K extends string>(obj: R, keys: K): asserts obj is R ;
-// export function pluckDeep<R extends Record<string, unknown>, K extends string>(obj: R, ...keys: K[]): asserts obj is R ;
-// export function pluckDeep<R, K>(obj: R, ...keys: K): asserts obj is R  {
-//   return [keys].flatMap((key, i) => {
-//     return (key: K): asserts key is K => key.split(/[.:/]/g).reduce(
-//           (accum, key, i, k) => {
-//               if (accum[key]) return accum[key];
-//               if (/^([0-9]+|\[[0-9]+\])$/.test(key)) {
-//                 if (Array.isArray(accum[k[i+1]]))
-//                   return accum[k[i+1]][key]
-//                 if (Array.isArray(accum['children']))
-//                   return accum['children'][key]
-//               }
-//           },
-//       obj);
-//     }
-//   }
-// }
 
 /**
  * Create a new subset object by giving keys
@@ -373,7 +356,6 @@ export function objectPick<O, T extends keyof O>(
         n[k] = obj[k];
       }
     }
-
     return n;
   }, {} as Pick<O, T>);
 }

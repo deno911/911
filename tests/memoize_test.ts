@@ -1,4 +1,4 @@
-import { memoize } from "./memoize.ts";
+import { memoize } from "../src/memoize.ts";
 import {
   beforeAll,
   beforeEach,

@@ -9,7 +9,7 @@ import {
   createSingletonPromise,
   p,
   PInstance,
-} from "./promises.ts";
+} from "../src/promises.ts";
 import { assert } from "../deps_test.ts";
 
 const tests = <Deno.TestDefinition[]> [

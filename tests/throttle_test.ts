@@ -3,7 +3,7 @@
 /// <reference lib="esnext" />
 
 import { assertEquals } from "../deps_test.ts";
-import { debounce, sleep, throttle } from "./throttle.ts";
+import { debounce, sleep, throttle } from "../src/throttle.ts";
 
 Deno.test({
   name: "throttle",

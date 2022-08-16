@@ -3,7 +3,7 @@
 /// <reference lib="esnext" />
 
 import { assertEquals } from "../deps_test.ts";
-import * as date from "./date.ts";
+import * as date from "../src/date.ts";
 
 Deno.test({
   name: "date.relative()",

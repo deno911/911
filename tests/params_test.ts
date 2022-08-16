@@ -8,7 +8,7 @@ import {
   assertInstanceOf,
 } from "../deps_test.ts";
 
-import { Params } from "./params.ts";
+import { Params } from "../src/params.ts";
 
 Deno.test({
   name: "Params.parse(string)",

@@ -49,13 +49,13 @@ export function parse(
  * @param formatString - valid format string, e.g. `yyyy-MM-dd`
  * @returns formatted date string
  */
-export const format = (
+export function format(
   date: Date | string | number,
   formatString = defaultFormatString,
-) => {
+): string {
   date = (typeof date === "string") ? parse(date) : new Date(date);
   return format_date(date as Date, formatString);
-};
+}
 
 /**
  * Calculate the difference between two dates.

@@ -3,7 +3,7 @@
 /// <reference lib="esnext" />
 
 import { assertEquals, assertInstanceOf } from "../deps_test.ts";
-import { SerializeSet } from "./serialize_set.ts";
+import { SerializeSet } from "../src/serialize_set.ts";
 
 const init = () => new SerializeSet([1, 1, 2, 3]);
 

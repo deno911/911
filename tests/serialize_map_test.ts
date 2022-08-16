@@ -3,7 +3,7 @@
 /// <reference lib="esnext" />
 
 import { assertEquals, assertInstanceOf } from "../deps_test.ts";
-import { SerializeMap } from "./serialize_map.ts";
+import { SerializeMap } from "../src/serialize_map.ts";
 
 const init = () =>
   new SerializeMap([
