@@ -9,10 +9,8 @@ export * as http from "./src/http.ts";
 export * as log from "./src/log.ts";
 export * as math from "./src/math.ts";
 export * as promises from "./src/promises.ts";
+export * from "./src/memoize.ts";
+export * from "./src/params.ts";
+export * from "./src/state.ts";
 export * from "./src/throttle.ts";
 export * from "./src/type.ts";
-
-export { default as params } from "./src/params.ts";
-export { State as state } from "./src/state.ts";
-
-export { is } from "./deps.ts";

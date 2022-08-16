@@ -17,9 +17,6 @@ import {
   zip,
 } from "../deps.ts";
 
-export * from "./serialize_map.ts";
-export * from "./serialize_set.ts";
-
 import { clamp } from "./math.ts";
 
 /**
