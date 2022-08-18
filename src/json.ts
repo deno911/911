@@ -1,10 +1,23 @@
-export declare type JSONReplacer = Maybe<(key: string, value: any) => any>;
-export declare type JSONInit = {
-  replacer?: JSONReplacer;
-  space?: string | number;
-} & ResponseInit;
+import { Status, STATUS_TEXT } from "./http.ts";
+
+export declare type JSONReplacerFn = (
+  this: any,
+  key: string,
+  value: any,
+) => any;
+
 export declare type JSONValue<T extends any = string | number | boolean> =
   T extends T | T[] | Record<string, (T | T[] | Record<string, T>)> ? T : never;
+
+export declare type JSONInitAlt = {
+  replacer?: Maybe<OmitThisParameter<JSONReplacerFn>>;
+  space?: string | number;
+} & ResponseInit;
+
+export declare type JSONInit = {
+  replacer: (string | number)[];
+  space: string | number;
+} & ResponseInit;
 
 /**
  * Create a new response in JSON format, with built-in error handling and
@@ -16,11 +29,23 @@ export declare type JSONValue<T extends any = string | number | boolean> =
  * @param init optional configurations for `Response` and `JSON`
  * @returns
  */
-export function json<T extends any = JSONValue>(data: T, {
+export function json<T extends any>(data: T, {
+  replacer,
+  space,
+  ...init
+}?: Partial<JSONInit>): Response;
+
+export function json<T extends any>(data: T, {
+  replacer,
+  space,
+  ...init
+}?: Partial<JSONInitAlt>): Response;
+
+export function json<T extends any>(data: T, {
   replacer,
   space = 2,
   ...init
-}: JSONInit = {}): Response {
+}: any = {}): Response {
   let body: string;
   try {
     body = JSON.stringify(data, replacer ?? undefined, space);
@@ -30,14 +55,23 @@ export function json<T extends any = JSONValue>(data: T, {
     }, { status: 500, space, ...init });
   }
 
-  const headers: HeadersInit = {
+  const headers: HeadersInit = new Headers({
     "Content-Type": "application/json; charset=utf-8",
     "Content-Length": `${(body?.length ?? 0)}`,
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Headers": "*",
     "Access-Control-Allow-Methods": "*",
-    ...(init?.headers ?? {}),
-  };
+    ...(Object.fromEntries(new Headers(init?.headers).entries()) ?? {}),
+  });
 
-  return new Response(body, { ...init, headers });
+  const {
+    statusText = STATUS_TEXT.get(`${init?.status ?? Status.OK}`),
+  } = init?.statusText;
+
+  return new Response(body, {
+    ...init,
+    statusText,
+    status: init?.status ?? Status.OK,
+    headers,
+  });
 }

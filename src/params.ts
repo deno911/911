@@ -1,129 +1,215 @@
-import { decode, isObject, SerializeMap, toStringTag } from "./index.ts";
-
-/**
- * Extracts and parses parameters from search query or from the path.
- * Allows delimiters of `&` (standard), `;`, or `::`.
- * Trims and runs `decodeURIComponent` on all values.
- * @note Used internally by the `formatParams` method below.
- * @returns an array of param entries in `[key, value]` format
- */
-export function parseInitialParams(init: ParamsInit): string[][] {
-  let str = `${init?.toString()}`;
-  if (init instanceof URLSearchParams) {
-    str = init.toString();
-  } else if (
-    (isObject(init as any) || (Array.isArray(init) &&
-      (init[0] != null && typeof init[0][0] === "string")))
-  ) {
-    str = new URLSearchParams(init).toString();
-  }
-
-  return `${str ?? ""}`.split(/([:]{2}|[;&])/).map(
-    (p: string) => [
-      (p.split("=")[0] ?? "").trim(),
-      decode((p.split("=")[1] ?? "").trim()),
-    ],
-    // janky way to filter out empty values... but it works
-  ).filter(([k, v]) => (v != null && v != "" && k != "&"));
-}
-
-/**
- * Normalizes an arbitrary number of parameter sets, from various different
- * types, into a single `URLSearchParams` instance. Each argument provided is
- * treated as a separate set of parameters. Allowed types are `string`,
- * `string[][]`, `Record<string, string>`, and `URLSearchParams`. They are
- * first converted into `[key,value]` pairs (entries), then merged into a
- * literal object, and finally initialized as a `URLSearchParams` instance.
- * @param params parameter groups to parse, normalize, and merge
- * @returns a new, normalized URLSearchParams object
- */
-export function formatParams<Params extends ParamsInit>(
-  ...p: Array<Params & ParamsInit>
-): URLSearchParams {
-  const parameters = (p ?? []).reduce(
-    (acc: ParamObject, cur: Params) => ({
-      ...acc,
-      ...Object.fromEntries(parseInitialParams(cur) ?? []),
-    }),
-    {} as ParamObject,
-  );
-
-  return new URLSearchParams(parameters as ParamObject);
-}
-
-/**
- * Creates a new `URLSearchParams` object from a string or an array of
- * key/value pairs.
- *
- * @param init the initializer value
- * @returns a new `URLSearchParams` object
- */
-export function createURLSearchParams(
-  init?: URLSearchParamsInit,
-): URLSearchParams {
-  const params = new URLSearchParams(init);
-
-  /**
-   * Extracts and parses parameters from search query or from the path.
-   * Allows delimiters of `&` (standard), `;`, or `::`.
-   * Trims and runs `decodeURIComponent` on all values.
-   * @note Used internally by the `formatParams` method below.
-   * @returns an array of param entries in `[key, value]` format
-   */
-  function parseParams(s: string): URLSearchParams {
-    const entries: string[][] = `${s ?? ""}`.split(/([;&,])/)
-      .map((p) => [...(p.split("=") ?? []).map((s) => s.trim())])
-      .filter(([k, v]) => (v != null && v != "" && k != "&"));
-    return createURLSearchParams(entries);
-  }
-
-  if (init == null) return params;
-  if (typeof init === "string") {
-    init = [...parseParams(init).entries()];
-  } else if (Array.isArray(init) && Array.isArray(init[0])) {
-    init = [...init];
-  } else if (toStringTag(init, "Object")) {
-    init = [...Object.entries(init)];
-  } else if (
-    init instanceof URLSearchParams ||
-    (init instanceof Map || init instanceof SerializeMap)
-  ) {
-    init = [...init.entries()];
-  } else {
-    throw new TypeError(`Invalid initializer type: ${typeof init}`);
-  }
-  (init as [string, string][]).forEach(([k, v]) => params.append(k, v));
-  return params;
-}
+import { decode, is, removeEmptyValues } from "./index.ts";
 
 export declare type Obj<T extends string = string> = Record<string, T>;
-export declare type URLSearchParamsInit =
+export declare type ParamsInit =
   | string
   | string[][]
   | Record<string, string>
   | URLSearchParams;
 
-/**
- * Normalizes an arbitrary number of parameter sets, from various different
- * types, into a single `URLSearchParams` instance. Each argument provided is
- * treated as a separate set of parameters. Allowed types are `string`,
- * `string[][]`, `Record<string, string>`, and `URLSearchParams`. They are
- * first converted into `[key,value]` pairs (entries), then merged into a
- * literal object, and finally initialized as a `URLSearchParams` instance.
- * @param params parameter groups to parse, normalize, and merge
- * @returns a new, normalized URLSearchParams object
- */
-export function normalizeParams(
-  ...p: URLSearchParamsInit[]
-): URLSearchParams {
-  const parameters = (p ?? []).reduce(
-    (acc, cur) =>
-      new URLSearchParams([
-        ...(acc as any).entries(),
-        createURLSearchParams(cur),
-      ]),
-    new URLSearchParams(),
-  ) as URLSearchParams;
-  parameters.sort();
-  return parameters;
+export declare interface ParamsOptions {
+  distinct?: boolean;
+  sort?: boolean;
+  defaultParams?: Record<string, string>;
 }
+
+export class Params extends URLSearchParams {
+  readonly options: ParamsOptions;
+
+  constructor(init?: ParamsInit, options: ParamsOptions = {}) {
+    super((init && Params.validate(init)) ? init : undefined);
+    this.options = Object.assign({}, Params.#options, options);
+    return this;
+  }
+
+  toObject(): Obj {
+    return Params.toObject(this);
+  }
+
+  /**
+   * Sorts all parameters, flattens any keys with multiple values (using
+   * the last value encountered as each key's final value), and then sorts
+   * them once again.
+   *
+   * @example const params = new Params("key=val1&key2=val2&key=val3");
+   * params.distinct().toString();
+   * // key=val3&key2=val2
+   */
+  distinct(): Params {
+    for (const key of new Set(this.keys())) {
+      const val = this.get(key);
+      this.set(key, [...this.getAll(key)].pop()! ?? val);
+    }
+    return this;
+  }
+
+  get [Symbol.toStringTag](): "Params" {
+    return "Params" as const;
+  }
+
+  [Symbol.toPrimitive](hint: "number" | "string" | "default") {
+    if (hint === "number") {
+      return this.size;
+    }
+    if (hint === "string") {
+      return this.toString();
+    }
+    return JSON.stringify(this);
+  }
+
+  get size(): number {
+    try {
+      return [...this.keys()].length;
+    } catch {
+      return 0;
+    }
+  }
+
+  get length(): number {
+    return this.size;
+  }
+
+  getAll(names: string | string[]) {
+    if (is.array<string>(names)) {
+      return names.flatMap((name) => super.getAll(name) ?? [], this);
+    }
+    return super.getAll(names as string);
+  }
+
+  get<T extends any = string>(names: string[]): T[];
+  get<T extends any = string>(name: string): T;
+  get(names: string | string[]) {
+    if (is.array<string>(names)) {
+      return names.flatMap((name) => this.get(name), this);
+    }
+    return this.getAll(names).pop();
+  }
+
+  toJSON() {
+    return Object.fromEntries(
+      [...this.entries()].map(([k]) => [k, this.get<string>(k)]),
+    );
+  }
+
+  private static readonly RE = {
+    params: /(?<=[?#&;,]?)([^&;,=]+)(?:[=]([^&;,]+)|)/g,
+    groups: /(?<=[^&;#]*)[&;](?=[^&;#]*)/g,
+    values: /(?<=[^&;#=]+)[=](?=[^&;#]*)/g,
+  } as const;
+
+  static readonly #options: ParamsOptions = {
+    distinct: false,
+    sort: true,
+    defaultParams: {},
+  };
+
+  static set #defaultParams(val: ParamsInit) {
+    Object.assign(Params.#options, {
+      defaultParams: Params.parse(val).toJSON(),
+    });
+  }
+
+  static get #defaultParams(): ParamsInit {
+    return Params.#options.defaultParams;
+  }
+
+  /**
+   * Verify if an arbitrary value is fit for initializing a Params instance.
+   * @param value
+   * @returns
+   */
+  static validate(value: unknown, named = false): value is ParamsInit {
+    return (
+      (is.string(value) && Params.RE.params.test(value)) ||
+      (is.array(value) && is.array(value[0]) &&
+        is.all(is.string, ...value[0])) ||
+      is.directInstanceOf(value, Params) ||
+      is.urlSearchParams(value) ||
+      is.plainObject<string>(value)
+    );
+  }
+
+  /**
+   * Parse parameters from a string, array of entries, object literal, or
+   * an existing Params / URLSearchParams instance. Allows parameters with
+   * semicolon (`;`) delimiters, per the IETF RFC specification.
+   * @param value raw value to be parsed
+   * @returns
+   */
+  static parse<T extends ParamsInit>(value: T): Params;
+  static parse<T extends ParamsInit, U extends ParamsInit>(
+    value1: T,
+    value2: U,
+  ): Params;
+  static parse<
+    T extends ParamsInit,
+    U extends ParamsInit,
+    V extends ParamsInit,
+  >(value1: T, value2: U, value3: V): Params;
+  static parse<
+    T extends ParamsInit,
+    U extends ParamsInit,
+    V extends ParamsInit,
+    W extends ParamsInit,
+    All extends ParamsInit = T & U & V & W,
+  >(value1: T, value2: U, value3: V, value4: W): Params;
+  static parse<T extends any>(...values: T[]): Params {
+    const init = new Params(Params.#defaultParams);
+
+    const stringToEntries = (value: string): string[][] =>
+      `${value.toString()}`.split(Params.RE.groups).map((p) =>
+        p.split(Params.RE.values)
+      );
+    const isEntries = (
+      value: unknown,
+    ): value is string[][] => (is.array(value) && is.array(value[0]) &&
+      is.all(is.string, ...value[0]));
+
+    for (const value of values) {
+      if (Params.validate(value)) {
+        const entries: string[][] = (
+          isEntries(value)
+            ? value
+            : (is.string(value) && Params.RE.params.test(value))
+            ? stringToEntries(value)
+            : is.plainObject<string>(value)
+            ? Array.from(Object.entries<string>(value) as string[][])
+            : is.urlSearchParams(value)
+            ? Array.from((value as URLSearchParams).entries())
+            : is.directInstanceOf(value, Params)
+            ? Array.from((value as Params).entries())
+            : []
+        );
+        for (let [key, val] of [...entries]) {
+          key = decode(key.trim());
+          val = decode(val?.trim?.() ?? "");
+          init.append(key, val);
+        }
+      }
+    }
+    init.sort();
+    return init;
+  }
+
+  static toObject<T extends any = { [K: string]: string }>(params: Params): T {
+    return removeEmptyValues(
+      Object.fromEntries<string>(params as Iterable<[string, string]>),
+    ) as T;
+  }
+
+  static get [Symbol.toStringTag](): "Params" {
+    return "Params" as const;
+  }
+
+  static get [Symbol.species]() {
+    return Params;
+  }
+
+  static get [Symbol.unscopables]() {
+    return {
+      toJSON: false,
+    };
+  }
+}
+
+export default Params;

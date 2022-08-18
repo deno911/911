@@ -1,5 +1,10 @@
 {
   "importMap": "./import_map.json",
+  "tasks": {
+    "flint": "deno fmt && deno lint --unstable",
+    "prepare": "deno install -A -f -n land https://deno.land/x/land@v0.9.3/cli.ts",
+    "release": "which land &>/dev/null || deno task prepare; deno task flint && land publish -A"
+  },
   "compilerOptions": {
     "lib": [
       "deno.ns",
@@ -13,27 +18,39 @@
     ],
     "strict": true,
     "strictNullChecks": false,
-    "experimentalDecorators": true,
     "keyofStringsOnly": true
   },
   "lint": {
     "rules": {
       "exclude": [
-        "no-explicit-any"
+        "no-explicit-any",
+        "ban-types",
+        "ban-ts-comment",
+        "no-unused-vars"
       ]
     },
     "files": {
       "exclude": [
+        ".devcontainer",
         ".vscode",
-        ".git*"
+        ".git*",
+        "*_test.ts"
       ]
     }
   },
   "fmt": {
     "files": {
       "exclude": [
+        ".devcontainer*",
         ".vscode",
         ".git*"
+      ]
+    }
+  },
+  "test": {
+    "files": {
+      "exclude": [
+        "deps_test.ts"
       ]
     }
   }

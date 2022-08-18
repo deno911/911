@@ -1,5 +1,16 @@
-/// <reference no-default-lib="true" />
+/// <reference no-default-lib="true">
 
-import * as _ from "./src/index.ts";
-export * from "./src/index.ts";
-export default _;
+export * as default from "./src/index.ts";
+export * as collection from "./src/collection.ts";
+export * as date from "./src/date.ts";
+export * as fmt from "./src/fmt.ts";
+export * as hash from "./src/hash.ts";
+export * as http from "./src/http.ts";
+export * as log from "./src/log.ts";
+export * as math from "./src/math.ts";
+export * from "./src/promises.ts";
+export * from "./src/json.ts";
+export * from "./src/memoize.ts";
+export * from "./src/params.ts";
+export * from "./src/state.ts";
+export * from "./src/type.ts";
