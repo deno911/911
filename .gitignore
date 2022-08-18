@@ -11,3 +11,4 @@ cov
 node_modules
 docs
 *.*workspace
+types

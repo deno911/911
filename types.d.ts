@@ -4,16 +4,6 @@ declare type Maybe<T extends any> = T | undefined;
 
 declare type Obj<T extends string = string> = Record<string, T>;
 
-declare type URLSearchParamsInit =
-  | string
-  | string[][]
-  | Record<string, string>
-  | URLSearchParams;
-
-declare type ParamObject = Record<string, string>;
-
-declare type ParamsInit = URLSearchParamsInit;
-
 /**
  * Matches any primitive value.
  * @see https://mdn.io/Primitive
@@ -72,8 +62,9 @@ declare type Arrayable<T> = T | Array<T>;
 /**
  * Function
  */
-declare type Method<T = void> = () => T;
-declare type Fn<T = void, A = any> = (...args: A[]) => T;
+declare type Method<T = void> = import("./src/type.ts").Method<T>;
+
+declare type Fn<T = void, A = any> = import("./src/type.ts").Fn<T, A>;
 
 /**
  * Constructor
