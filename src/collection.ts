@@ -572,7 +572,7 @@ export function assign<T extends {}, U, V extends any[] = U[]>(
  * @param predicate the predicate to use to filter the keys
  * @returns a new object with only the keys that match the predicate
  * @example ```ts
- * import { filterKeys } from "https://deno.land/x/911@0.0.5/src/collection.ts";
+ * import { filterKeys } from "https://deno.land/x/911@0.1.0/src/collection.ts";
  * import { assertEquals } from "https://deno.land/std/testing/asserts.ts";
  *
  * const menu = {
@@ -610,7 +610,7 @@ export function filterKeys<T>(
  * @example ```ts
  * import {
  *   filterValues
- * } from "https://deno.land/x/911@0.0.5/src/collection.ts";
+ * } from "https://deno.land/x/911@0.1.0/src/collection.ts";
  *
  * import {
  *   assertEquals
@@ -653,7 +653,7 @@ export function filterValues<T>(
  * @example ```ts
  * import {
  *   filterEntries
- * } from "https://deno.land/x/911@0.0.5/src/collection.ts";
+ * } from "https://deno.land/x/911@0.1.0/src/collection.ts";
  * import {
  *   assertEquals
  * } from "https://deno.land/std/testing/asserts.ts";
@@ -699,7 +699,7 @@ export function filterEntries<T>(
  * @example ```ts
  * import {
  *   mapKeys
- * } from "https://deno.land/x/911@0.0.5/src/collection.ts";
+ * } from "https://deno.land/x/911@0.1.0/src/collection.ts";
  * import {
  *   assertEquals
  * } from "https://deno.land/std/testing/asserts.ts";
@@ -734,7 +734,7 @@ export function mapKeys<T>(
  * @example ```ts
  * import {
  *   mapValues
- * } from "https://deno.land/x/911@0.0.5/src/collection.ts";
+ * } from "https://deno.land/x/911@0.1.0/src/collection.ts";
  * import {
  *   assertEquals
  * } from "https://deno.land/std/testing/asserts.ts";
@@ -770,7 +770,7 @@ export function mapValues<T, O>(
  * a new record containing the results.
  * @category Collection
  * @example ```ts
- * import { mapEntries } from "https://deno.land/x/911@0.0.5/src/collection.ts";
+ * import { mapEntries } from "https://deno.land/x/911@0.1.0/src/collection.ts";
  * import {
  *   assertEquals
  * } from "https://deno.land/std/testing/asserts.ts";
