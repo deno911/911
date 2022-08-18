@@ -12,7 +12,7 @@
     "case": "https://deno.land/x/case@2.1.1/mod.ts",
     "case/": "https://deno.land/x/case@2.1.1/",
     "preact": "https://esm.sh/v89/preact@10.10.0/deno/preact.js",
-    "preact-render-to-string": "https://esm.sh/v89/preact-render-to-string@5.2.1/X-ZS9wcmVhY3Q/deno/preact-render-to-string.js",
+    "preact-render-to-string": "https://esm.sh/preact-render-to-string@5.2.1?target=deno",
     "http-cache": "https://deno.land/x/httpcache@0.1.2/in_memory.ts",
     "http-cache/": "https://deno.land/x/httpcache@0.1.2/",
     "media_types": "https://deno.land/x/media_types@v2.13.0/mod.ts"
