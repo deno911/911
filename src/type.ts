@@ -95,7 +95,7 @@ export { isFalsey as falsey, isFalsey as falsy };
  * @param message the message to throw if the condition is false
  * @category Types
  * @example ```ts
- * import { assertsThat } from "https://deno.land/x/911@0.1.1/src/type.ts";
+ * import { assertsThat } from "https://deno.land/x/911@0.1.2/src/type.ts";
  *
  * assertsThat(true, "true is true");
  * ```

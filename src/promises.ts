@@ -174,7 +174,7 @@ export interface SingletonPromiseReturn<T> {
  * @returns the singleton promise function
  * @see {@link SingletonPromiseReturn}
  * @example ```ts
- * import { createSingletonPromise } from "https://deno.land/x/911@0.1.1/src/promises.ts";
+ * import { createSingletonPromise } from "https://deno.land/x/911@0.1.2/src/promises.ts";
  * const singleton = createSingletonPromise(async () => {
  *   const result = await someAsyncOperation();
  *   return result;
@@ -217,7 +217,7 @@ export interface ControlledPromise<T = void> extends Promise<T> {
  * Return a Promise with `resolve` and `reject` methods
  * @category Promises
  * @example ```ts
- * import { controlledPromise } from "https://deno.land/x/911@0.1.1/src/promises.ts";
+ * import { controlledPromise } from "https://deno.land/x/911@0.1.2/src/promises.ts";
  * const promise = createControlledPromise()
  *
  * await promise
@@ -294,7 +294,7 @@ const noop = () => {};
  * Create a promise pool for controlled execution of promises.
  * @category Promises
  * @example ```ts
- * import { Promises } from "https://deno.land/x/911@0.1.1/src/promises.ts";
+ * import { Promises } from "https://deno.land/x/911@0.1.2/src/promises.ts";
  *
  * const pool = Promises.from([
  *   async () => {
@@ -458,7 +458,7 @@ export class Promises<T extends any = any> extends Promise<Awaited<T>[]> {
  * @see https://github.com/antfu/utils/tree/main/docs/p.md
  * @category Promises
  * @example ```ts
- * import { p } from "https://deno.land/x/911@0.1.1/src/promises.ts";
+ * import { p } from "https://deno.land/x/911@0.1.2/src/promises.ts";
  *
  * const items = [1, 2, 3, 4, 5]
  *

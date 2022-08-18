@@ -6,13 +6,13 @@
  * @param upper The upper bound.
  * @returns A random number.
  * @example ```ts
- * import { randomInteger } from "https://deno.land/x/911@0.1.1/src/math.ts";
+ * import { randomInteger } from "https://deno.land/x/911@0.1.2/src/math.ts";
  *
  * for (let i = 0; i < 5; i++) randomInteger(1, 1e3);
  * // 347, 562, 901, 64, 4
  * ```
  * @example ```ts
- * import { randomInteger } from "https://deno.land/x/911@0.1.1/src/math.ts";
+ * import { randomInteger } from "https://deno.land/x/911@0.1.2/src/math.ts";
  *
  * for (let i = 0; i < 5; i++) randomInteger(1, 20);
  * // => 4, 18, 11, 19, 1
@@ -30,7 +30,7 @@ export function randomInteger(lower: number, upper: number): number {
  * @param max The upper bound of the clamp range.
  * @returns New value with the range constraint applied.
  * @example ```ts
- * import { clamp } from "https://deno.land/x/911@0.1.1/src/math.ts";
+ * import { clamp } from "https://deno.land/x/911@0.1.2/src/math.ts";
  *
  * clamp(0, 1, 3) // => 1
  * clamp(1, 1, 3) // => 1
@@ -38,7 +38,7 @@ export function randomInteger(lower: number, upper: number): number {
  * clamp(3, 1, 3) // => 3
  * ```
  * @example ```ts
- * import { clamp } from "https://deno.land/x/911@0.1.1/src/math.ts";
+ * import { clamp } from "https://deno.land/x/911@0.1.2/src/math.ts";
  *
  * clamp(0, -1, 1) // => -1
  * clamp(1, -1, 1) // => 1
@@ -56,13 +56,13 @@ export function clamp(n: number, min: number, max: number): number {
  * @param values The array of values to reduce.
  * @returns The sum of all values contained in the array(s).
  * @example ```ts
- * import { sum } from "https://deno.land/x/911@0.1.1/src/math.ts";
+ * import { sum } from "https://deno.land/x/911@0.1.2/src/math.ts";
  *
  * sum([1, 2, 3, 4, 5]);
  * // 15
  * ```
  * @example ```ts
- * import { sum } from "https://deno.land/x/911@0.1.1/src/math.ts";
+ * import { sum } from "https://deno.land/x/911@0.1.2/src/math.ts";
  *
  * sum([[1, 2, 3, 4, 5, 6], 2, 4, 6]);
  * // 21

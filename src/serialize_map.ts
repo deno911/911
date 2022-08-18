@@ -24,7 +24,7 @@
  * // (serialized into a valid JSON object)
  *
  * ```
- * @see {@link https://deno.land/x/911@0.1.1/src/serialize_map.ts}
+ * @see {@link https://deno.land/x/911@0.1.2/src/serialize_map.ts}
  * @author Nicholas Berlette <https://github.com/nberlette>
  * @license MIT
  */

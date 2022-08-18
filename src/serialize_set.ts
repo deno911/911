@@ -7,7 +7,7 @@
  * // [1, 2, 3] - serialized into a valid JSON array
  * @example JSON.stringify(new Set([1, 2, 2, 3]));
  * // {} - standard Set does *not* serialize into JSON
- * @see {@link https://deno.land/x/911@0.1.1/src/serialize_set.ts}
+ * @see {@link https://deno.land/x/911@0.1.2/src/serialize_set.ts}
  * @author Nicholas Berlette <https://github.com/nberlette>
  * @license MIT
  */
