@@ -11,7 +11,6 @@ import {
   minBy,
   minOf,
   minWith,
-  partition as partitionBy,
   sample,
   unzip,
   zip,
