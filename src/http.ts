@@ -186,7 +186,7 @@ export interface ServeStaticOptions {
  * can disable caching by setting `cache: false` in the options object.
  *
  * @example ```ts
- * import { serve, serveStatic } from "https://deno.land/x/911@0.1.0/mod.ts"
+ * import { serve, serveStatic } from "https://deno.land/x/911@0.1.1/mod.ts"
  *
  * serve({
  *   // It is required that the path ends with `:filename+`
@@ -250,7 +250,7 @@ export function serveStatic(
  *
  * @example
  * ```js
- * import { serve, json } from "https://deno.land/x/911@0.1.0/mod.ts"
+ * import { serve, json } from "https://deno.land/x/911@0.1.1/mod.ts"
  *
  * serve({
  *  "/": () => json({ message: "hello world"}),
@@ -264,7 +264,7 @@ export function serveStatic(
  *
  * @example
  * ```jsx
- * import { serve, jsx, h } from "https://deno.land/x/911@0.1.0/mod.ts"
+ * import { serve, jsx, h } from "https://deno.land/x/911@0.1.1/mod.ts"
  *
  * const Greet = ({name}) => <div>Hello, {name}</div>;
  *

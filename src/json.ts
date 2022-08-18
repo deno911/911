@@ -29,7 +29,7 @@ export declare type JSONInit = {
  * @param init optional configurations for `Response` and `JSON`
  * @returns
  * @example ```ts
- * import { json } from "https://deno.land/x/911@0.1.0/mod.ts";
+ * import { json } from "https://deno.land/x/911@0.1.1/mod.ts";
  * import { STATUS_TEXT } from "https://deno.land/std/http/http_status.ts";
  *
  * const response = json({
