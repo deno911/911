@@ -13,5 +13,4 @@ export * from "./promises.ts";
 export * from "./serialize_map.ts";
 export * from "./serialize_set.ts";
 export * from "./state.ts";
-export * from "./throttle.ts";
 export * from "./type.ts";
