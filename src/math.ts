@@ -18,7 +18,7 @@
  * // => 4, 18, 11, 19, 1
  * ```
  */
-export function randomInteger(lower: number, upper: number) {
+export function randomInteger(lower: number, upper: number): number {
   return lower + Math.floor(Math.random() * (upper - lower + 1));
 }
 
@@ -46,7 +46,7 @@ export function randomInteger(lower: number, upper: number) {
  * clamp(3, -1, 1) // => 1
  * ```
  */
-export function clamp(n: number, min: number, max: number) {
+export function clamp(n: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, n));
 }
 

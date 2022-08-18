@@ -1,6 +1,6 @@
 import { ansi } from "./fmt.ts";
 
-enum LogLevel {
+export enum LogLevel {
   Debug,
   Info,
   Warn,
@@ -8,12 +8,12 @@ enum LogLevel {
   Fatal,
 }
 
-declare type AllCaseVariants<T extends string> =
+export declare type AllCaseVariants<T extends string> =
   | Lowercase<T>
   | Capitalize<Lowercase<T>>
   | Uppercase<T>;
 
-declare type LogLevelName = AllCaseVariants<keyof typeof LogLevel>;
+export declare type LogLevelName = AllCaseVariants<keyof typeof LogLevel>;
 
 export class Timing {
   #t = performance.now();

@@ -5,12 +5,10 @@
 /// <reference lib="deno.ns" />
 
 import { type ConnInfo, serve as std_serve, type ServeInit } from "../deps.ts";
-
 import { log } from "./log.ts";
 import { globalCache } from "./cache.ts";
 import { json } from "./json.ts";
 import { etag } from "./hash.ts";
-export * from "./json.ts";
 
 import {
   getContentType,
@@ -24,8 +22,6 @@ import {
 const STATUS_TEXT = new Map<string, any>(Object.entries(_STATUS_TEXT));
 
 export { renderToString, Status, STATUS_TEXT };
-
-export * from "./json.ts";
 
 declare type PathParams = Record<string, string> | undefined;
 
@@ -256,7 +252,8 @@ export function serveStatic(
  * ```
  */
 
-/** Renders JSX components to HTML and returns a Response with `text/html`
+/**
+ * Renders JSX components to HTML and returns a Response with `text/html`
  * as the `content-type.`
  *
  * @example

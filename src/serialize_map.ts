@@ -75,4 +75,18 @@ export class SerializeMap<T extends any> extends Map<string, T> {
     }
     return this;
   }
+
+  override set(key: string, value: T): this {
+    super.set(key, value);
+    return this;
+  }
+
+  override delete(key: string): boolean {
+    return super.delete(key);
+  }
+
+  override clear(): SerializeMap<T> {
+    super.clear();
+    return this;
+  }
 }

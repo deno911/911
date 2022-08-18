@@ -106,7 +106,8 @@ export declare interface RelativeTimeOptions
 }
 
 /**
- * Formats a relative time string from a numeric value (positive for the future, negative for the past) and a unit of time (e.g. "minutes", "hours").
+ * Formats a relative time string from a numeric value (positive for the
+ * future, negative for the past) and a unit of time.
  * @param value number to format to a relative string
  * @param unit relative units of time (e.g. `"days"`, `"hours"`, etc.)
  * @param options configure the behavior of the time formatting API

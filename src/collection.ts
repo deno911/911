@@ -16,13 +16,13 @@ import {
   unzip,
   zip,
 } from "../deps.ts";
-
+import type { Arrayable, Nullable } from "./type.ts";
 import { clamp } from "./math.ts";
 
 /**
  * Convert `Arrayable<T>` to `Array<T>`
  *
- * @category Array
+ * @category Collection
  */
 export function toArray<T>(array?: Nullable<Arrayable<T>>): Array<T> {
   array = array || [];
@@ -33,9 +33,37 @@ export function toArray<T>(array?: Nullable<Arrayable<T>>): Array<T> {
 }
 
 /**
- * Convert `Arrayable<T>` to `Array<T>` and flatten it
+ * Convert `Arrayable<T>`, `Iterable<T>`, etc. to a normalized `Array<T>`.
+ * @example ```ts
+ * import { toArray } from "./collection.ts";
  *
- * @category Array
+ * toArray([1, 2, 3]); // [1, 2, 3]
+ * toArray(new Set([1, 2, 3])); // [1, 2, 3]
+ * toArray(new Map([[1, 2], [2, 3], [3, 4]]).keys()); // [1, 2, 3]
+ * ```
+ * @category Collection
+ */
+export function ensureArray<T>(
+  array?: Arrayable<any>,
+): Array<T> {
+  array ??= [];
+  if (is.array<T>(array)) {
+    return (array as T[]);
+  }
+  // @ts-ignore - type is not arrayable
+  array = [array as any].flat<T, 1>(1) as unknown as T[];
+  return Array.from<T>(array as Iterable<T> | ArrayLike<T>);
+}
+
+/**
+ * Convert `Arrayable<T>` to `Array<T>` and flatten it
+ * @category Collection
+ * @example ```ts
+ * import { flatten } from "./collection.ts";
+ *
+ * flatten([1, 2, 3]); // [1, 2, 3]
+ * flatten([[1, 2], [3, 4]]); // [1, 2, 3, 4]
+ * ```
  */
 export function flattenArrayable<T>(
   array?: Nullable<Arrayable<T | Array<T>>>,
@@ -45,20 +73,34 @@ export function flattenArrayable<T>(
 
 /**
  * Use rest arguments to merge arrays
+ * @category Collection
+ * @example ```ts
+ * import { merge } from "./collection.ts";
  *
- * @category Array
+ * merge([1, 2, 3], [4, 5, 6]); // [1, 2, 3, 4, 5, 6]
+ * ```
+ * @param args Array of Arrayables to merge
  */
 export function mergeArrayable<T>(...args: Nullable<Arrayable<T>>[]): Array<T> {
   return args.flatMap((i) => toArray(i));
 }
 
+/**
+ * Partition Filter as used by the `partition` function.
+ * @category Collection
+ * @see {@link partition}
+ */
 export type PartitionFilter<T> = (i: T, idx: number, arr: readonly T[]) => any;
 
 /**
  * Divide an array into two parts by a filter function
- *
- * @category Array
+ * @category Collection
  * @example const [odd, even] = partition([1, 2, 3, 4], i => i % 2 != 0)
+ * @example ```ts
+ * import { partition } from "./collection.ts";
+ *
+ * partition([1, 2, 3, 4], i => i % 2 != 0); // [[1, 3], [2, 4]]
+ * ```
  */
 export function partition<T>(
   array: readonly T[],
@@ -122,16 +164,16 @@ export function partition<T>(
 /**
  * Unique an Array
  *
- * @category Array
+ * @category Collection
  */
 export function uniq<T>(array: readonly T[]): T[] {
-  return Array.from(new Set(array));
+  return Array.from<T>(new Set(array));
 }
 
 /**
  * Get last item
  *
- * @category Array
+ * @category Collection
  */
 export function last(array: readonly []): undefined;
 export function last<T>(array: readonly T[]): T;
@@ -142,7 +184,7 @@ export function last<T>(array: readonly T[]): T | undefined {
 /**
  * Remove an item from Array
  *
- * @category Array
+ * @category Collection
  */
 export function remove<T>(array: T[], value: T) {
   if (!array) {
@@ -159,7 +201,7 @@ export function remove<T>(array: T[], value: T) {
 /**
  * Get nth item of Array. Negative for backward
  *
- * @category Array
+ * @category Collection
  */
 export function at(array: readonly [], index: number): undefined;
 export function at<T>(array: readonly T[], index: number): T;
@@ -177,9 +219,14 @@ export function at<T>(array: readonly T[] | [], index: number): T | undefined {
 }
 
 /**
- * Genrate a range array of numbers. The `stop` is exclusive.
+ * Generate a range array of numbers. The `stop` is exclusive.
+ * @category Collection
+ * @example ```ts
+ * import { range } from "./collection.ts";
  *
- * @category Array
+ * range(0, 5); // [0, 1, 2, 3, 4]
+ * range(0, 5, 2); // [0, 2, 4]
+ * ```
  */
 export function range(stop: number): number[];
 export function range(start: number, stop: number, step?: number): number[];
@@ -207,10 +254,15 @@ export function range(...args: any): number[] {
 /**
  * Move element in an Array
  *
- * @category Array
- * @param arr
- * @param from
- * @param to
+ * @category Collection
+ * @param arr Array to move
+ * @param from Index to move from
+ * @param to Index to move to
+ * @example ```ts
+ * import { move } from "./collection.ts";
+ *
+ * move([1, 2, 3, 4], 1, 3); // [1, 3, 2, 4]
+ * ```
  */
 export function move<T>(arr: T[], from: number, to: number): T[] {
   arr.splice(to, 0, arr.splice(from, 1)[0]);
@@ -219,17 +271,68 @@ export function move<T>(arr: T[], from: number, to: number): T[] {
 
 /**
  * Clamp a number to the index ranage of an array
+ * @category Collection
+ * @param arr Array to clamp to
+ * @param n Number to clamp
+ * @example ```ts
+ * import { clampArrayRange } from "./collection.ts";
  *
- * @category Array
+ * clampArrayRange([1, 2, 3, 4], 0); // 1
+ * clampArrayRange([1, 2, 3, 4], 2); // 2
+ * clampArrayRange([1, 2, 3, 4], 5); // 4
+ * ```
  */
-export function clampArrayRange(n: number, arr: readonly unknown[]) {
+export function clampArrayRange<T extends any>(n: number, arr: readonly T[]) {
   return clamp(n, 0, arr.length - 1);
+}
+
+/**
+ * Clamp a number to the index ranage of an array
+ * @category Collection
+ * @param arr Array to clamp
+ * @param max Number to clamp the array length to
+ * @example ```ts
+ * import { clampArrayTo } from "./collection.ts";
+ *
+ * clampArrayTo([1, 2, 3, 4], 0); // []
+ * clampArrayTo([1, 2, 3, 4], 2); // [1, 2]
+ * clampArrayTo([1, 2, 3, 4], 3); // [1, 2, 3]
+ * ```
+ */
+export function clampArrayTo<T extends any>(
+  arr: Arrayable<T>,
+  max: number,
+) {
+  arr = ensureArray<T>(arr) as T[];
+  return arr?.slice?.(0, clampArrayRange<T>(max, arr));
+}
+
+/**
+ * Force an array to be within a clamped range, from a minimum index to the end
+ * of the array. Like `clampArray`, but with minimum instead of maximum index.
+ * @category Collection
+ * @param arr Array to clamp
+ * @param min Number to clamp the array length to
+ * @example ```ts
+ * import { clampArrayFrom } from "./collection.ts";
+ *
+ * clampArrayFrom([1, 2, 3, 4], 0); // [1, 2, 3, 4]
+ * clampArrayFrom([1, 2, 3, 4], 1); // [2, 3, 4]
+ * clampArrayFrom([1, 2, 3, 4], 2); // [3, 4]
+ * ```
+ */
+export function clampArrayFrom<T extends any>(
+  arr: Arrayable<T>,
+  min: number,
+) {
+  arr = ensureArray<T>(arr) as T[];
+  return arr?.slice?.(0, clampArrayRange<T>(min, arr));
 }
 
 /**
  * Shuffle an array. This function mutates the array.
  *
- * @category Array
+ * @category Collection
  */
 export function shuffle<T>(array: T[]): T[] {
   for (let i = array.length - 1; i > 0; i--) {
@@ -292,9 +395,6 @@ export function objectMap<V, NV extends V, K extends string>(
   )?.filter(notNullish);
   return Object.fromEntries<V>(entries as [K, V][]) as Record<K, NV>;
 }
-
-export type Maybe<T> = T | null | undefined;
-
 /**
  * Determines whether an object has a property with the specified name
  *
@@ -372,12 +472,10 @@ export function deepMerge<T extends Record<string, any>, S = keyof T>(
   if (!sources.length) {
     return target as any;
   }
-
   const source = sources.shift();
   if (source === undefined) {
     return target as any;
   }
-
   if (isMergableObject(target) && isMergableObject(source)) {
     // @ts-expect-error
     objectKeys(source).forEach((key) => {
@@ -467,13 +565,16 @@ export function assign<T extends {}, U, V extends any[] = U[]>(
 }
 
 /**
- * Returns a new record with all entries of the given record except the ones that have a key that does not match the given predicate
+ * Returns a new record with all entries of the given record except the ones
+ * that have a key that does not match the given predicate
  *
- * Example:
- *
- * ```ts
- * import { filterKeys } from "https://deno.land/std@$STD_VERSION/collections/filter_keys.ts";
- * import { assertEquals } from "https://deno.land/std@$STD_VERSION/testing/asserts.ts";
+ * @category Collection
+ * @param record the object to filter
+ * @param predicate the predicate to use to filter the keys
+ * @returns a new object with only the keys that match the predicate
+ * @example ```ts
+ * import { filterKeys } from "https://deno.land/x/911@0.0.5/src/collection.ts";
+ * import { assertEquals } from "https://deno.land/std/testing/asserts.ts";
  *
  * const menu = {
  *     'Salad': 11,
@@ -500,18 +601,21 @@ export function filterKeys<T>(
       ret[key] = record[key];
     }
   }
-
   return ret;
 }
 
 /**
- * Returns a new record with all entries of the given record except the ones that have a value that does not match the given predicate
+ * Returns a new record with all entries of the given record except the ones
+ * that have a value that does not match the given predicate
+ * @category Collection
+ * @example ```ts
+ * import {
+ *   filterValues
+ * } from "https://deno.land/x/911@0.0.5/src/collection.ts";
  *
- * Example:
- *
- * ```ts
- * import { filterValues } from "https://deno.land/std@$STD_VERSION/collections/filter_values.ts";
- * import { assertEquals } from "https://deno.land/std@$STD_VERSION/testing/asserts.ts";
+ * import {
+ *   assertEquals
+ * } from "https://deno.land/std/testing/asserts.ts";
  *
  * type Person = { age: number };
  *
@@ -520,12 +624,11 @@ export function filterKeys<T>(
  *     'Sarah': { age: 7 },
  *     'Kim': { age: 23 },
  * };
- * const adults = filterValues(people, it => it.age >= 18)
- *
+ * const adults = filterValues(people, it => it.age >= 18);
  * assertEquals(adults, {
  *     'Arnold': { age: 37 },
  *     'Kim': { age: 23 },
- * })
+ * });
  * ```
  */
 export function filterValues<T>(
@@ -547,11 +650,14 @@ export function filterValues<T>(
 /**
  * Returns a new record with all entries of the given record except the ones that do not match the given predicate
  *
- * Example:
- *
- * ```ts
- * import { filterEntries } from "https://deno.land/std@$STD_VERSION/collections/filter_entries.ts";
- * import { assertEquals } from "https://deno.land/std@$STD_VERSION/testing/asserts.ts";
+ * @category Collection
+ * @example ```ts
+ * import {
+ *   filterEntries
+ * } from "https://deno.land/x/911@0.0.5/src/collection.ts";
+ * import {
+ *   assertEquals
+ * } from "https://deno.land/std/testing/asserts.ts";
  *
  * const menu = {
  *     'Salad': 11,
@@ -584,24 +690,28 @@ export function filterEntries<T>(
 }
 
 /**
- * Applies the given transformer to all keys in the given record's entries and returns a new record containing the
- * transformed entries.
+ * Applies the given transformer to all keys in the given record's entries and
+ * returns a new record containing the transformed entries.
  *
- * If the transformed entries contain the same key multiple times, only the last one will appear in the returned record.
+ * If the transformed entries contain the same key multiple times, only the
+ * last one will appear in the returned record.
  *
- * Example:
+ * @category Collection
+ * @example ```ts
+ * import {
+ *   mapKeys
+ * } from "https://deno.land/x/911@0.0.5/src/collection.ts";
+ * import {
+ *   assertEquals
+ * } from "https://deno.land/std/testing/asserts.ts";
  *
- * ```ts
- * import { mapKeys } from "https://deno.land/std@$STD_VERSION/collections/map_keys.ts";
- * import { assertEquals } from "https://deno.land/std@$STD_VERSION/testing/asserts.ts";
- *
- * const counts = { a: 5, b: 3, c: 8 }
+ * const counts = { a: 5, b: 3, c: 8 };
  *
  * assertEquals(mapKeys(counts, it => it.toUpperCase()), {
  *     A: 5,
  *     B: 3,
  *     C: 8,
- * })
+ * });
  * ```
  */
 export function mapKeys<T>(
@@ -610,31 +720,31 @@ export function mapKeys<T>(
 ): Record<string, T> {
   const ret: Record<string, T> = {};
   const keys = Object.keys(record);
-
   for (const key of keys) {
     const mappedKey = transformer(key);
     ret[mappedKey] = record[key];
   }
-
   return ret;
 }
 
 /**
- * Applies the given transformer to all values in the given record and returns a new record containing the resulting keys
- * associated to the last value that produced them.
- *
- * Example:
- *
- * ```ts
- * import { mapValues } from "https://deno.land/std@$STD_VERSION/collections/map_values.ts";
- * import { assertEquals } from "https://deno.land/std@$STD_VERSION/testing/asserts.ts";
+ * Applies the given transformer to all values in the given record and returns
+ * a new record containing the resulting keys associated to the last value that
+ * produced them.
+ * @category Collection
+ * @example ```ts
+ * import {
+ *   mapValues
+ * } from "https://deno.land/x/911@0.0.5/src/collection.ts";
+ * import {
+ *   assertEquals
+ * } from "https://deno.land/std/testing/asserts.ts";
  *
  * const usersById = {
  *     'a5ec': { name: 'Mischa' },
  *     'de4f': { name: 'Kim' },
- * }
+ * };
  * const namesById = mapValues(usersById, it => it.name)
- *
  * assertEquals(namesById, {
  *     'a5ec': 'Mischa',
  *     'de4f': 'Kim',
@@ -657,13 +767,14 @@ export function mapValues<T, O>(
 }
 
 /**
- * Applies the given transformer to all entries in the given record and returns a new record containing the results
- *
- * Example:
- *
- * ```ts
- * import { mapEntries } from "https://deno.land/std@$STD_VERSION/collections/map_entries.ts";
- * import { assertEquals } from "https://deno.land/std@$STD_VERSION/testing/asserts.ts";
+ * Applies the given transformer to all entries in the given record and returns
+ * a new record containing the results.
+ * @category Collection
+ * @example ```ts
+ * import { mapEntries } from "https://deno.land/x/911@0.0.5/src/collection.ts";
+ * import {
+ *   assertEquals
+ * } from "https://deno.land/std/testing/asserts.ts";
  *
  * const usersById = {
  *     'a2e': { name: 'Kim', age: 22 },
@@ -673,13 +784,13 @@ export function mapValues<T, O>(
  *
  * const agesByNames = mapEntries(usersById,
  *     ([ id, { name, age } ]) => [ name, age ],
- * )
+ * );
  *
  * assertEquals(agesByNames, {
  *     'Kim': 22,
  *     'Anna': 31,
  *     'Tim': 58,
- * })
+ * });
  * ```
  *
  * @copyright 2018-2022 the Deno authors. All rights reserved.
@@ -708,6 +819,18 @@ export function mapEntries<
   return ret;
 }
 
+/**
+ * Removes any nullish or empty values from a given record.
+ * @param obj The record to filter.
+ * @returns A new record containing only the non-nullish and non-empty values.
+ * @category Collection
+ * @example ```ts
+ * import { removeEmptyValues } from "./collection.ts";
+ *
+ * const obj = { a: 1, b: '', c: null, d: undefined };
+ * removeEmptyValues(obj); // { a: 1 }
+ * ```
+ */
 export function removeEmptyValues(
   obj: Record<string, unknown>,
 ): Record<string, unknown> {
@@ -721,22 +844,40 @@ export function removeEmptyValues(
   );
 }
 
+/**
+ * Diff two arrays, returning a new array of only the elements that are not
+ * shared between the two arrays.
+ * @param arrA The first array to diff.
+ * @param arrB The second array to diff, treated as the exclusion group.
+ * @returns A new array containing only elements not shared between the two.
+ * @category Collection
+ * @example ```ts
+ * import { diff } from "./collection.ts";
+ *
+ * diff([1, 2, 3, 4], [1, 2, 3]); // [4]
+ * ```
+ */
 export function diff(arrA: string[], arrB: string[]): string[] {
   return arrA.filter((a) => arrB.indexOf(a) < 0);
 }
 
 /**
  * Splits the given array into chunks of the given size and returns them
+ * @category Collection
+ * @example ```ts
+ * import { chunk } from "./collection.ts";
+ * import { assertEquals } from "./asserts.ts";
  *
- * Example:
- *
- * ```ts
- * import { chunk } from "https://deno.land/x/911/collection.ts";
- * import { assertEquals } from "https://deno.land/x/911/asserts.ts";
- *
- * const words = [ 'lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consetetur', 'sadipscing' ];
+ * const words = [
+ *   'lorem',
+ *   'ipsum',
+ *   'dolor',
+ *   'sit',
+ *   'amet',
+ *   'consetetur',
+ *   'sadipscing',
+ * ];
  * const chunks = chunk(words, 3);
- *
  * assertEquals(chunks, [
  *     [ 'lorem', 'ipsum', 'dolor' ],
  *     [ 'sit', 'amet', 'consetetur' ],
@@ -767,15 +908,12 @@ export function chunk<T>(array: readonly T[], size: number): T[][] {
 }
 
 /**
- * Transforms the given array into a Record, extracting the key of each element using the given selector.
- * If the selector produces the same key for multiple elements, the latest one will be used (overriding the
- * ones before it).
- *
- * Example:
- *
- * ```ts
- * import { associateBy } from "https://deno.land/x/911/objects.ts"
- * import { assertEquals } from "https://deno.land/x/911/testing.ts";
+ * Transforms the given array into a Record, extracting the key of each element
+ * using the given selector. If the selector produces the same key for multiple
+ * elements, the latest one will be used (overriding the ones before it).
+ * @category Collection
+ * @example ```ts
+ * import { associateBy } from "./collection.ts"
  *
  * const users = [
  *     { id: 'a2e', userName: 'Anna' },
@@ -784,11 +922,11 @@ export function chunk<T>(array: readonly T[], size: number): T[][] {
  * ]
  *
  * const usersById = associateBy(users, it => it.id)
- * assertEquals(usersById, {
- *     'a2e': { id: 'a2e', userName: 'Anna' },
- *     '5f8': { id: '5f8', userName: 'Arnold' },
- *     'd2c': { id: 'd2c', userName: 'Kim' },
- * })
+ * // {
+ * //   'a2e': { id: 'a2e', userName: 'Anna' },
+ * //   '5f8': { id: '5f8', userName: 'Arnold' },
+ * //   'd2c': { id: 'd2c', userName: 'Kim' },
+ * // }
  * ```
  */
 export function associateBy<T>(
@@ -803,24 +941,21 @@ export function associateBy<T>(
 }
 
 /**
- * Builds a new Record using the given array as keys and choosing a value for each
+ * Builds a new Record using the given array as keys, choosing a value for each
  * key using the given selector. If any of two pairs would have the same value
  * the latest on will be used (overriding the ones before it).
- *
- * Example:
- *
- * ```ts
- * import { associateWith } from "https://deno.land/std@$STD_VERSION/collections/associate_with.ts"
- * import { assertEquals } from "https://deno.land/std@$STD_VERSION/testing/asserts.ts";
+ * @category Collection
+ * @example ```ts
+ * import { associateWith } from "./collection.ts"
  *
  * const names = [ 'Kim', 'Lara', 'Jonathan' ]
  * const namesToLength = associateWith(names, it => it.length)
  *
- * assertEquals(namesToLength, {
- *   'Kim': 3,
- *   'Lara': 4,
- *   'Jonathan': 8,
- * })
+ * // {
+ * //   'Kim': 3,
+ * //   'Lara': 4,
+ * //   'Jonathan': 8,
+ * // }
  * ```
  */
 export function associateWith<T>(
@@ -837,6 +972,7 @@ export function associateWith<T>(
 /**
  * Groups an array of objects into a new object, with properties
  * that are determined by the value returned by `callbackfn`.
+ * @category Collection
  * @param array Array of objects to be organized into groups
  * @param callbackfn Function that is used to determine group names
  * @returns new object with groups for property names
@@ -886,10 +1022,11 @@ export function sortInPlace<T extends Record<string, any>>(
 
 /**
  * Sort an array of objects by a shared property key.
- *
  * @param array collection of objects to sort
  * @param key property
  * @returns a copy of the source array, with sorted values
+ * @category Collection
+ * @example ```ts
  */
 export function sortBy<T extends Record<string, any>>(
   array: T[],
@@ -901,10 +1038,9 @@ export function sortBy<T extends Record<string, any>>(
 /**
  * Returns all distinct elements that appear in any of the given arrays
  *
- * Example:
- *
- * ```ts
- * import { union } from "https://deno.land/std@$STD_VERSION/collections/union.ts";
+ * @category Collection
+ * @example ```ts
+ * import { union } from "./collection.ts";
  * import { assertEquals } from "https://deno.land/std@$STD_VERSION/testing/asserts.ts";
  *
  * const soupIngredients = [ 'Pepper', 'Carrots', 'Leek' ]
@@ -927,9 +1063,8 @@ export function union<T>(...arrays: (readonly T[])[]): T[] {
 /**
  * Returns all distinct elements that appear at least once in each of the given arrays
  *
- * Example:
- *
- * ```ts
+ * @category Collection
+ * @example ```ts
  * import { intersect } from "https://deno.land/std@$STD_VERSION/collections/intersect.ts";
  * import { assertEquals } from "https://deno.land/std@$STD_VERSION/testing/asserts.ts";
  *
@@ -954,13 +1089,24 @@ export function intersect<T>(...arrays: (readonly T[])[]): T[] {
 }
 
 /**
- * Filters the given array, removing all elements that do not match the given predicate
- * **in place. This means `array` will be modified!**.
+ * Filters the given array, removing all elements that do not match the given
+ * predicate _in place_. **This means `array` will be modified!**.
+ * @param array Array to be filtered
+ * @param predicate Predicate to be applied to each element
+ * @returns reference to the same array
+ * @category Collection
+ * @example ```ts
+ * import { filterInPlace } from "./collection.ts";
+ * import { assertEquals } from "https://deno.land/std@$STD_VERSION/testing/asserts.ts";
+ * const numbers = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]
+ * filterInPlace(numbers, it => it % 2 === 0)
+ * assertEquals(numbers, [ 2, 4, 6, 8, 10 ])
+ * ```
  */
 export function filterInPlace<T>(
-  array: Array<T>,
+  array: T[],
   predicate: (el: T) => boolean,
-): Array<T> {
+): T[] {
   let outputIndex = 0;
 
   for (const cur of array) {
@@ -979,8 +1125,10 @@ export function filterInPlace<T>(
  * @param o the original object to inherit from
  * @param keys the list of properties to copy to the new object
  * @returns a new object
- *
+ * @category Collection
  * @example ```ts
+ * import { pick } from "./collection.ts";
+ *
  * const obj1 = { a: 1, b: 4, c: 8 };
  * const obj2 = pick(obj1, ["a", "c"]);
  * // { a: 1, c: 8 }

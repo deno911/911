@@ -1,5 +1,4 @@
-import { type Cache, inMemoryCache } from "http-cache";
-export * from "http-cache";
+import { type Cache, inMemoryCache } from "../deps.ts";
 
 const cache: { [k: symbol]: Cache } = {};
 const CACHE_CAPACITY = 20;

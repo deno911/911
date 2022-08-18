@@ -4,6 +4,7 @@ export * from "./date.ts";
 export * from "./fmt.ts";
 export * from "./hash.ts";
 export * from "./http.ts";
+export * from "./json.ts";
 export * from "./log.ts";
 export * from "./math.ts";
 export * from "./memoize.ts";
