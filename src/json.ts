@@ -28,6 +28,24 @@ export declare type JSONInit = {
  * @param data the response body to be stringified and sent
  * @param init optional configurations for `Response` and `JSON`
  * @returns
+ * @example ```ts
+ * import { json } from "https://deno.land/x/911@0.1.0/mod.ts";
+ * import { STATUS_TEXT } from "https://deno.land/std/http/http_status.ts";
+ *
+ * const response = json({
+ *  message: "Hello World",
+ * });
+ *
+ * // Equivalent to:
+ * // new Response("{\"message\":\"Hello World\"}", {
+ * //   status: 200,
+ * //   headers: {
+ * //     "content-type": "application/json; charset=utf-8",
+ * //     "content-length": "17",
+ * //     "etag": "W/5c8qKJoE6P9Q",
+ * //     "access-control-allow-origin": "*",
+ * //   },
+ * // });
  */
 export function json<T extends any>(data: T, {
   replacer,

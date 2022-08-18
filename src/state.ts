@@ -1,3 +1,5 @@
+import { is } from "./type.ts";
+
 /** @internal */
 const __KEY__ = Symbol("__STATE__");
 
@@ -8,21 +10,11 @@ const __STATE__ = {
 
 type Nil = null | undefined;
 
-export declare namespace State {
-  type Init<T> =
-    | Map<string, T>
-    | [string, T][]
-    | Record<string, T>
-    | Iterable<[string, T]>;
-
-  interface Context<T> {
-    state: State<T>;
-  }
-}
-
-export type StateInit<T extends any = string> = State.Init<T>;
-
-export type TContext<T extends any = any> = State.Context<T>;
+type StateInit<T extends any = string> =
+  | Map<string, T>
+  | [string, T][]
+  | Record<string, T>
+  | Iterable<[string, T]>;
 
 export class State<T extends any = unknown> {
   protected $ = __STATE__[__KEY__];
@@ -33,11 +25,11 @@ export class State<T extends any = unknown> {
    * @param initial (optional) Initial state
    * @returns a new State instance with optional initial value.
    */
-  constructor(initial: State.Init<T> = []) {
-    if (initial && State.isObject(initial)) {
+  constructor(initial: StateInit<T> = []) {
+    if (initial && is.plainObject(initial)) {
       initial = Object.entries(initial);
     }
-    if (initial instanceof Map) {
+    if (is.map(initial)) {
       initial = [...(initial as Map<string, any>).entries()];
     }
     __STATE__[__KEY__] = new Map([
@@ -52,10 +44,17 @@ export class State<T extends any = unknown> {
    * @param key The key (`string`) to add or update
    * @param value The value to set for the given key
    * @returns `State` instance, for optional chaining
+   * @example ```ts
+   * import { State } from "https://deno.land/x/911@0.1.0/src/state.ts";
+   * const state = new State();
    *
-   * @example state.set('a', 1); // { a: 1 }
-   * @example state.set(['a', 'b'], 1); // { a: 1, b: 1 }
-   * @example state.set({ b: 2, c: 3 }).set('a', 1); // { a: 1, b: 2, c: 3 }
+   * state.set("a", 1);
+   * // { a: 1 }
+   * state.set(["a", "b"], 1);
+   * // { a: 1, b: 1 }
+   * state.set({ b: 2, c: 3 }).set("a", 1);
+   * // { a: 1, b: 2, c: 3 }
+   * ```
    */
   public set<V extends T>(key: string, value: V): State<T>;
 
@@ -65,30 +64,28 @@ export class State<T extends any = unknown> {
    * @param key List of keys (`string[]`) to add or update
    * @param value The value to set for the given keys
    * @returns `State` instance, for optional chaining
-   * @example state.set(['a', 'b'], 1);
-   * // { a: 1, b: 1 }
-   * @example state.set({ a: 1, b: 2 });
-   * // { a: 1, b: 2 }
    */
   public set<V extends T>(key: string[], value: V): State<T>;
 
   /**
-   * Add or update the values for multiple keys using an object of type `Record<string, V>`.
+   * Add or update the values for multiple keys using an object.
    * @param key An object literal with the format `{ key: value }`
    * @returns `State` instance, for optional chaining
-   * @example state.set({ b: 2, c: 3 }).set('a', 1); // { a: 1, b: 2, c: 3 }
    */
   public set<V extends T>(key: Record<string, V>, value: Nil): State<T>;
 
-  public set(key: any, value: any): State<T> {
-    if (State.isObject(key)) {
+  public set(
+    key: string | string[] | Record<string, any>,
+    value: any,
+  ): State<T> {
+    if (is.plainObject(key)) {
       for (const k in key) {
         this.$.set(k, key[k]);
       }
       return this;
     }
-    if (typeof key === "string" || Array.isArray(key)) {
-      [key].flat().forEach((k) => this.$.set(k, value));
+    if (is.string(key) || is.array(key)) {
+      [key].flat().forEach((k: string) => this.$.set(k, value));
     }
     return this;
   }
@@ -110,7 +107,7 @@ export class State<T extends any = unknown> {
   public get<V extends T>(key: string | string[], defaultValue?: V): V | V[] {
     defaultValue ??= undefined;
 
-    if (Array.isArray(key)) {
+    if (is.array(key)) {
       return key.map((k) => (this.$.get(k) ?? defaultValue)) as V[];
     }
     return (this.$.get(key) ?? defaultValue) as V;
@@ -120,9 +117,13 @@ export class State<T extends any = unknown> {
    * Returns `true` if the State instance contains a value for the given key.
    * @param key - the key to lookup
    * @returns `true` if the key exists in State, `false` otherwise.
-   * @example const state = new State([['a', 1]]);
-   * state.has('a'); // true
-   * state.has('c'); // false
+   * @example ```ts
+   * import { State } from "https://deno.land/x/911@0.1.0/src/state.ts";
+   *
+   * const state = new State([['a', 1]]);
+   * state.has("a"); // true
+   * state.has("c"); // false
+   * ```
    */
   public has(key: string): boolean;
 
@@ -133,8 +134,13 @@ export class State<T extends any = unknown> {
    * @param key - the keys to lookup
    * @returns `Record<string, boolean>`
    *
-   * @example const state = new State([['a', 1], ['b', 2]]);
-   * state.has(['a', 'b', 'c']) // { a: true, b: true, c: false }
+   * @example ```ts
+   * import { State } from "https://deno.land/x/911@0.1.0/src/state.ts";
+   *
+   * const state = new State([["a", 1], ["b", 2]]);
+   * state.has(["a", "b", "c"]);
+   * // { a: true, b: true, c: false }
+   * ```
    */
   public has(key: string[]): Record<string, boolean>;
 
@@ -154,9 +160,15 @@ export class State<T extends any = unknown> {
    * @param key - the key to delete
    * @returns the `State` instance, for optional chaining
    *
-   * @example const state = new State([['a', 1], ['b', 2], ['c', 3]]);
-   * state.delete('a'); // { b: 2, c: 3 }
-   * state.delete(['b', 'c']); // {}
+   * @example ```ts
+   * import { State } from "https://deno.land/x/911@0.1.0/src/state.ts";
+   *
+   * const state = new State([["a", 1], ["b", 2], ["c", 3]]);
+   * state.delete("a");
+   * // { b: 2, c: 3 }
+   * state.delete(["b", "c"]);
+   * // {}
+   * ```
    */
   public delete(key: string): State<T>;
 
@@ -165,13 +177,18 @@ export class State<T extends any = unknown> {
    * @param key - the keys to delete
    * @returns the `State` instance, for optional chaining
    *
-   * @example const state = new State([['a', 1], ['b', 2], ['c', 3]]);
-   * state.delete(['a', 'b', 'c']); // {}
+   * @example ```ts
+   * import { State } from "https://deno.land/x/911@0.1.0/src/state.ts";
+   *
+   * const state = new State([['a', 1], ['b', 2], ['c', 3]]);
+   * state.delete(['a', 'b', 'c']);
+   * // {}
+   * ```
    */
   public delete(key: string[]): State<T>;
 
   public delete(key: string | string[]): State<T> {
-    if (Array.isArray(key)) {
+    if (is.array(key)) {
       key.forEach((k) => this.delete(k));
     } else {
       if (this.has(key)) {
@@ -184,8 +201,13 @@ export class State<T extends any = unknown> {
   /**
    * Clears all values from the State instance.
    * @returns the `State` instance, for optional chaining.
-   * @example const state = new State([['a', 1], ['b', 2], ['c', 3]]);
-   * state.clear(); // {}
+   * @example ```ts
+   * import { State } from "https://deno.land/x/911@0.1.0/src/state.ts";
+   *
+   * const state = new State([['a', 1], ['b', 2], ['c', 3]]);
+   * state.clear();
+   * // {}
+   * ```
    */
   public clear(): State<T> {
     this.$.clear();
@@ -200,8 +222,12 @@ export class State<T extends any = unknown> {
    * @param [thisArg] - optional value to use as `this` when calling
    * `callbackfn`, defaults to the State instance.
    * @returns an array of the returned `callbackfn` values.
-   * @example const state = new State([['a', 1], ['b', 2]]);
+   * @example ```ts
+   * import { State } from "https://deno.land/x/911@0.1.0/src/state.ts";
+   *
+   * const state = new State([['a', 1], ['b', 2]]);
    * state.map((value, key) => value + key); // ['a1', 'b2']
+   * ```
    */
   public map<V>(
     callbackfn: (value: T, key: string, map: State<T>) => V,
@@ -252,13 +278,6 @@ export class State<T extends any = unknown> {
   /**
    * @returns The number of values currently in the State instance.
    */
-  public get length(): number {
-    return +this.$.size;
-  }
-
-  /**
-   * @returns The number of values currently in the State instance.
-   */
   public get size(): number {
     return +this.$.size;
   }
@@ -273,56 +292,12 @@ export class State<T extends any = unknown> {
    * @internal
    */
   toJSON(): Record<string, T> {
-    return Object.fromEntries(this.$.entries());
+    return Object.fromEntries(this.$);
   }
 
   /** @internal */
   get [Symbol.toStringTag](): "State" {
     return "State" as const;
-  }
-
-  /**
-   * Test if a given value is a plain object, and not a function, array, etc.
-   *
-   * @param obj The object to test.
-   * @returns `true` if `obj` is an object literal, `false` otherwise.
-   */
-  public static isObject(
-    obj: unknown,
-  ): obj is Record<string, any> {
-    if (Array.isArray(obj) || typeof obj === "function") return false;
-    return this.toStringTag(obj, "Object");
-  }
-
-  /**
-   * Determine the species of a given object via the `Symbol.toStringTag`
-   * accessor. For a plain object this returns `Object` (or `[object Object]`
-   * if the second param is `false`).
-   * You can also pass a string to compare with the tag, returning a boolean.
-   * @example toStringTag({}); // "Object"
-   * @example toStringTag({}, false); // "[object Object]"
-   * @example toStringTag([], "Array"); // true
-   * toStringTag([], "Object"); // false
-   */
-  public static toStringTag(obj: unknown, trim?: boolean): string;
-  /**
-   * Determine the species of a given object via its `Symbol.toStringTag`
-   * accessor and compare the value to an arbitrary string.
-   * @example toStringTag({}, "Object"); // true
-   * @example toStringTag(new Set(), "Map"); // false
-   */
-  public static toStringTag(obj: unknown, compare: string): boolean;
-  public static toStringTag(obj: any, compare: string | boolean = true) {
-    let tag = {}.toString.call(obj);
-    if (compare !== false) {
-      tag = (
-        compare === true ? tag.replace(/(^\[object |\]$)/, "") : tag
-      ).trim();
-    }
-    if (typeof compare === "string") {
-      return (compare.toLowerCase().trim() === tag.toLowerCase());
-    }
-    return tag;
   }
 }
 

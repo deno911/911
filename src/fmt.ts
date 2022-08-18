@@ -132,8 +132,8 @@ export function slugify(str: string): string {
     .replace(/^[-]+|[-]+$/g, "");
 }
 
-export type Template = string;
-export type Values<
+type Template = string;
+type Values<
   K extends string = string,
   V = string | ((...args: string[]) => string),
 > =

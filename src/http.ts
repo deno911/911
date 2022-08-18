@@ -4,46 +4,50 @@
 /// <reference lib="dom.asynciterable" />
 /// <reference lib="deno.ns" />
 
-import { type ConnInfo, serve as std_serve, type ServeInit } from "../deps.ts";
 import { log } from "./log.ts";
-import { globalCache } from "./cache.ts";
+import { CACHE_MAX_SIZE, globalCache } from "./cache.ts";
 import { json } from "./json.ts";
 import { etag } from "./hash.ts";
+import { is } from "./type.ts";
 
 import {
+  type ConnInfo,
   getContentType,
   path,
   renderToString,
+  serve as std_serve,
+  type ServeInit,
   Status,
-  STATUS_TEXT as _STATUS_TEXT,
+  STATUS_TEXT as STATUS_TEXT_ENUM,
   type VNode,
 } from "../deps.ts";
 
-const STATUS_TEXT = new Map<string, any>(Object.entries(_STATUS_TEXT));
+export const STATUS_TEXT = new Map<string, any>(
+  Object.entries(STATUS_TEXT_ENUM),
+);
 
-export { renderToString, Status, STATUS_TEXT };
-
-declare type PathParams = Record<string, string> | undefined;
+export declare type PathParams = Record<string, string> | undefined;
 
 /** Note: we should aim to keep it the same as std handler. */
-declare type Handler = (
+export declare type Handler = (
   request: Request,
   connInfo: ConnInfo,
   params: PathParams,
 ) => Promise<Response> | Response;
 
-declare interface Routes {
+export declare interface Routes {
   [path: string]: Handler;
 }
 
-export type { ConnInfo, Handler, PathParams, Routes, ServeInit };
+export type { ConnInfo, ServeInit };
 
-export { getContentType };
+export { getContentType, Status };
 
 let routes: Routes = { 404: defaultNotFoundPage };
 
-/** Given an extension, lookup the appropriate media type for that extension.
- * Likely you should be using `contentType()` though instead.
+/**
+ * Given an extension, lookup the appropriate media type for that extension.
+ * Likely you should be using `contentType()` instead.
  */
 export function lookupMediaType(pathname: string): string | undefined {
   const extension = path.extname(`x.${pathname}`).toLowerCase().slice(1);
@@ -52,12 +56,12 @@ export function lookupMediaType(pathname: string): string | undefined {
   return types.get(extension);
 }
 
-/** serve() registers "fetch" event listener and invokes the provided route
+/**
+ * serve() registers "fetch" event listener and invokes the provided route
  * handler for the route with the request as first argument and processed path
  * params as the second.
  *
- * @example
- * ```ts
+ * @example ```ts
  * serve({
  *  "/": (request: Request) => new Response("Hello World!"),
  *  404: (request: Request) => new Response("not found")
@@ -99,7 +103,7 @@ export async function handleRequest(
     const startTime = Date.now();
     let response = await globalCache.match(request);
 
-    if (typeof response === "undefined") {
+    if (is.undefined(response)) {
       for (const route of Object.keys(routes)) {
         // @ts-ignore URLPattern is still not available in dom lib.
         const pattern = new URLPattern({ pathname: route });
@@ -127,7 +131,7 @@ export async function handleRequest(
     }
 
     // return not found page if no handler is found.
-    if (response === undefined) {
+    if (is.undefined(response)) {
       response = await routes["404"](request, connInfo, {});
     }
 
@@ -155,19 +159,23 @@ export function defaultNotFoundPage() {
 }
 
 export interface ServeStaticOptions {
-  /** The base to be used for the construction of absolute URL. */
+  /**
+   * The base to be used for the construction of absolute URL.
+   */
   baseUrl: string;
-  /** A function to modify the response before it's served to the request.
+  /**
+   * A function to modify the response before it's served to the request.
    * For example, set appropriate content-type header.
-   *
-   * @default undefined */
+   * @default undefined
+   */
   intervene?: (
     request: Request,
     response: Response,
   ) => Promise<Response> | Response;
-  /** Disable caching of the responses.
-   *
-   * @default true */
+  /**
+   * Disable caching of the responses.
+   * @default true
+   */
   cache?: boolean;
 }
 
@@ -177,13 +185,12 @@ export interface ServeStaticOptions {
  * Be default, up to 20 static assets that are less than 10MB are cached. You
  * can disable caching by setting `cache: false` in the options object.
  *
- * @example
- * ```ts
- * import { serve, serveStatic } from "https://deno.land/x/sift/mod.ts"
+ * @example ```ts
+ * import { serve, serveStatic } from "https://deno.land/x/911@0.1.0/mod.ts"
  *
  * serve({
- *  // It is required that the path ends with `:filename+`
- *  "/:filename+": serveStatic("public", { baseUrl: import.meta.url }),
+ *   // It is required that the path ends with `:filename+`
+ *   "/:filename+": serveStatic("public", { baseUrl: import.meta.url }),
  * })
  * ```
  */
@@ -211,22 +218,21 @@ export function serveStatic(
       response = await globalCache.match(request);
     }
 
-    if (typeof response === "undefined") {
+    if (is.undefined(response)) {
       const body = await Deno.readFile(fileUrl);
       response = new Response(body);
       const contentType = getContentType(String(lookupMediaType(filePath)));
       if (contentType) {
         response.headers.set("content-type", contentType);
       }
-      if (typeof intervene === "function") {
+      if (is.function_(intervene)) {
         response = await intervene(request, response);
       }
 
       if (cache) {
         // We don't want to cache if the resource size if greater than 10MB.
         // The size is arbitrary choice.
-        const TEN_MB = 1024 * 1024 * 10;
-        if (Number(response.headers.get("content-length")) < TEN_MB) {
+        if (+(response.headers.get("content-length")) < CACHE_MAX_SIZE) {
           await globalCache.put(request, response);
         }
       }
@@ -244,7 +250,7 @@ export function serveStatic(
  *
  * @example
  * ```js
- * import { serve, json } from "https://deno.land/x/sift/mod.ts"
+ * import { serve, json } from "https://deno.land/x/911@0.1.0/mod.ts"
  *
  * serve({
  *  "/": () => json({ message: "hello world"}),
@@ -258,7 +264,7 @@ export function serveStatic(
  *
  * @example
  * ```jsx
- * import { serve, jsx, h } from "https://deno.land/x/sift/mod.ts"
+ * import { serve, jsx, h } from "https://deno.land/x/911@0.1.0/mod.ts"
  *
  * const Greet = ({name}) => <div>Hello, {name}</div>;
  *
@@ -275,10 +281,11 @@ export function jsx(jsx: VNode, init?: ResponseInit): Response {
     : new Headers(init?.headers);
 
   if (!headers.has("Content-Type")) {
+    333333333;
     headers.set("Content-Type", "text/html; charset=utf-8");
   }
 
-  return new Response(renderToString(jsx), {
+  return new Response(renderToString(jsx as any), {
     statusText: init?.statusText ??
       STATUS_TEXT.get((init?.status ?? Status.OK) as any),
     status: init?.status ?? Status.OK,

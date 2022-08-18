@@ -95,7 +95,7 @@ export { isFalsey as falsey, isFalsey as falsy };
  * @param message the message to throw if the condition is false
  * @category Types
  * @example ```ts
- * import { assertsThat } from "./type.ts";
+ * import { assertsThat } from "https://deno.land/x/911@0.1.0/src/type.ts";
  *
  * assertsThat(true, "true is true");
  * ```
@@ -114,26 +114,22 @@ type StripUnderscores<T> = T extends `${infer P}_`
     ? `${Capitalize<Lowercase<Q>>}${Capitalize<Lowercase<R>>}`
   : P
   : T;
-type Asserts =
-  & {
-    [K in keyof Assert]: Assert[K];
-  }
-  & {
-    class: Assert["class_"];
-    function: Assert["function_"];
-    null: Assert["null_"];
-    nil: Assert["nullOrUndefined"];
-  };
+type Asserts = Assert & {
+  class: Assert["class_"];
+  function: Assert["function_"];
+  null: Assert["null_"];
+  nil: Assert["nullOrUndefined"];
+};
 
-const isAsserts = Object.assign({}, isAssert, {
+const isAsserts = Object.assign({}, { ...isAssert }, {
   class: isAssert["class_"],
   function: isAssert["function_"],
   null: isAssert["null_"],
   nil: isAssert["nullOrUndefined"],
 });
 
-export function assertation<T>(
-  value: unknown,
+export function assert<T extends any = unknown>(
+  value: T,
   condition: keyof typeof isAsserts,
   message?: string,
 ): ReturnType<Asserts[keyof Asserts]> {
@@ -145,8 +141,6 @@ export function assertation<T>(
   }
   return (isAsserts as any)[condition](value);
 }
-
-// assertation({}, "object");
 
 export const noop = () => {};
 
@@ -178,8 +172,6 @@ export interface Constructable {
 
 export type Method<T = void> = () => T;
 
-export type { Method as Noop };
-
 export type Fn<T = void, A extends any = undefined> = A extends undefined
   ? Method<T>
   : ((...args: A[]) => Maybe<T>);
@@ -200,11 +192,6 @@ export type AsyncCallback<R = any, A = any> = (
 export type UnionToIntersection<U> =
   (U extends unknown ? (k: U) => void : never) extends (k: infer I) => void ? I
     : never;
-
-const union2intersection: Record<
-  UnionToIntersection<PropertyKey | boolean | string>,
-  any
-> = {};
 
 /**
  * Infers the arguments type of a function
@@ -227,9 +214,6 @@ export type MutableArray<T extends readonly any[]> = {
 };
 
 /**
- * "ValueOf" types: infer the values from a range of different types.
- */
-/**
  * Infers the element type of an array
  */
 export type ElementOf<T> = T extends (infer E)[] ? E : never;
@@ -241,6 +225,7 @@ export type KeyOf<T> = T extends Record<any, any> ? KeyOfRecord<T>
   : T extends object ? KeyOfObject<T>
   : T extends any[] ? KeyOfArray<T>
   : never;
+
 export type ValueOf<T> = T extends Record<any, any> ? ValueOfRecord<T>
   : T extends [any, any] ? ValueOfTuple<T>
   : T extends [any, any][] ? ValueOfEntries<T>
@@ -269,14 +254,5 @@ export type KeyOfUnion<T> = T extends UnionToIntersection<infer U> ? U : never;
 export type ValueOfUnion<T> = T extends UnionToIntersection<infer U> ? U
   : never;
 
-export type KeyOfIntersection<T> = T extends UnionToIntersection<infer U> ? U
-  : never;
-export type ValueOfIntersection<T> = T extends UnionToIntersection<infer U> ? U
-  : never;
-
 export type KeyOfObject<T> = T extends object ? keyof T : never;
 export type ValueOfObject<T> = T extends object ? T[keyof T] : never;
-
-export type ValueOfUnionToIntersection<T> = UnionToIntersection<
-  ValueOfUnion<T>
->;

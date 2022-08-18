@@ -1,4 +1,6 @@
-import { decode, is, removeEmptyValues } from "./index.ts";
+import { decode } from "./fmt.ts";
+import { is } from "./type.ts";
+import { removeEmptyValues } from "./collection.ts";
 
 export declare type Obj<T extends string = string> = Record<string, T>;
 export declare type ParamsInit =
@@ -211,5 +213,3 @@ export class Params extends URLSearchParams {
     };
   }
 }
-
-export default Params;

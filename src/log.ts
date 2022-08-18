@@ -8,12 +8,10 @@ export enum LogLevel {
   Fatal,
 }
 
-export declare type AllCaseVariants<T extends string> =
-  | Lowercase<T>
-  | Capitalize<Lowercase<T>>
-  | Uppercase<T>;
-
-export declare type LogLevelName = AllCaseVariants<keyof typeof LogLevel>;
+export declare type LogLevelName =
+  | Lowercase<keyof typeof LogLevel>
+  | Capitalize<Lowercase<keyof typeof LogLevel>>
+  | Uppercase<keyof typeof LogLevel>;
 
 export class Timing {
   #t = performance.now();

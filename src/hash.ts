@@ -87,6 +87,6 @@ export async function eTag(data: any, weak = true): Promise<string> {
 export { eTag as etag };
 
 /**
- * Utilities and helpers
+ * Generates a UUIDv4 string using the builtin crypto module.
  */
 export const uuid = () => crypto.randomUUID();
