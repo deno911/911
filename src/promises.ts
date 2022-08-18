@@ -42,7 +42,7 @@ export function sleep(
  * @see {@link debounce}
  */
 export function throttle<T>(
-  callback: Maybe<Fn<T>>,
+  callback: Fn<T>,
   delay = 250,
   debounceMode = false,
   noTrailing = false,
@@ -78,9 +78,9 @@ export function throttle<T>(
     /**
      * Execute `callback` and update the `lastExec` timestamp.
      */
-    async function exec() {
+    function exec() {
       lastExec = Date.now();
-      await callback.apply<any, any[], T>(self as any, args as any[]);
+      return callback.apply<any, any[], T>(self as any, args as any[]);
     }
     /**
      * If `debounceMode` is true (at begin) this is used to clear the flag
@@ -100,7 +100,7 @@ export function throttle<T>(
        * In throttle mode, if `delay` time has been exceeded, execute
        * `callback`.
        */
-      exec();
+      return exec();
     } else if (noTrailing !== true) {
       /**
        * In trailing throttle mode, since `delay` time has not been

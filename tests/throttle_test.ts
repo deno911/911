@@ -3,13 +3,13 @@
 /// <reference lib="esnext" />
 
 import { assertEquals } from "../deps_test.ts";
-import { debounce, sleep, throttle } from "../src/throttle.ts";
+import { debounce, sleep, throttle } from "../src/promises.ts";
 
 Deno.test({
   name: "throttle",
   ignore: true,
   fn(test) {
-    const func = (...args: any[]) => {
+    const func = (...args: any[]): any[] => {
       return args;
     };
     const throttled = throttle(func, 100);
@@ -39,7 +39,7 @@ Deno.test({
       return args;
     };
     const throttled = throttle(func, 100);
-    throttled.clear();
+    throttled.cancel();
     const result = throttled(1, 2, 3);
     assertEquals(result, [1, 2, 3]);
   },
@@ -53,7 +53,7 @@ Deno.test({
       return args;
     };
     const debounced = debounce(func, 100);
-    debounced.clear();
+    debounced.cancel();
     const result = debounced(1, 2, 3);
     assertEquals(result, [1, 2, 3]);
   },
