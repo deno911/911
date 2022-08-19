@@ -12,3 +12,11 @@ node_modules
 docs
 *.*workspace
 types
+.experiments
+.hidden
+.private
+.old
+.backups
+.stashed
+.types
+.tests

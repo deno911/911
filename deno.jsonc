@@ -16,9 +16,8 @@
     "types": [
       "./types.d.ts"
     ],
-    "strict": false,
-    "strictNullChecks": false,
-    "keyofStringsOnly": true
+    "strict": true,
+    "strictNullChecks": true
   },
   "lint": {
     "rules": {
