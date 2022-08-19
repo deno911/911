@@ -3,7 +3,7 @@
 Opinionated collection of utilities and helpers, assembled with Deno in mind.
 
 ```ts
-import * as _ from "https://deno.land/x/911@0.1.2/mod.ts";
+import * as _ from "https://deno.land/x/911@0.1.3/mod.ts";
 ```
 
 ```tree
@@ -556,7 +556,7 @@ function defaultNotFoundPage(): Response;
  * can disable caching by setting `cache: false` in the options object.
  *
  * @example ```ts
- * import { serve, serveStatic } from "https://deno.land/x/911@0.1.2/src/http.ts"
+ * import { serve, serveStatic } from "https://deno.land/x/911@0.1.3/src/http.ts"
  *
  * serve({
  *  // It is required that the path ends with `:filename+`
@@ -981,20 +981,20 @@ All rights reserved.
 > _Apologies to any contributors not included here - email me to have these
 > credits amended with your license/copyright info. Thank you!_
 
-[docs-cache]: https://doc.deno.land/https://deno.land/x/911@0.1.2/src/cache.ts
-[docs-http]: https://doc.deno.land/https://deno.land/x/911@0.1.2/src/http.ts
-[docs-hash]: https://doc.deno.land/https://deno.land/x/911@0.1.2/src/hash.ts
-[docs-collection]: https://doc.deno.land/https://deno.land/x/911@0.1.2/src/collection.ts
-[docs-fmt]: https://doc.deno.land/https://deno.land/x/911@0.1.2/src/fmt.ts
-[docs-json]: https://doc.deno.land/https://deno.land/x/911@0.1.2/src/json.ts
-[docs-log]: https://doc.deno.land/https://deno.land/x/911@0.1.2/src/log.ts
-[docs-math]: https://doc.deno.land/https://deno.land/x/911@0.1.2/src/math.ts
-[docs-date]: https://doc.deno.land/https://deno.land/x/911@0.1.2/src/date.ts
-[docs-memoize]: https://doc.deno.land/https://deno.land/x/911@0.1.2/src/memoize.ts
-[docs-serialize-map]: https://doc.deno.land/https://deno.land/x/911@0.1.2/src/serialize_map.ts
-[docs-serialize-set]: https://doc.deno.land/https://deno.land/x/911@0.1.2/src/serialize_set.ts
-[docs-params]: https://doc.deno.land/https://deno.land/x/911@0.1.2/src/params.ts
-[docs-promises]: https://doc.deno.land/https://deno.land/x/911@0.1.2/src/promises.ts
-[docs-state]: https://doc.deno.land/https://deno.land/x/911@0.1.2/src/state.ts
-[docs-throttle]: https://doc.deno.land/https://deno.land/x/911@0.1.2/src/throttle.ts
-[docs-type]: https://doc.deno.land/https://deno.land/x/911@0.1.2/src/type.ts
+[docs-cache]: https://doc.deno.land/https://deno.land/x/911@0.1.3/src/cache.ts
+[docs-http]: https://doc.deno.land/https://deno.land/x/911@0.1.3/src/http.ts
+[docs-hash]: https://doc.deno.land/https://deno.land/x/911@0.1.3/src/hash.ts
+[docs-collection]: https://doc.deno.land/https://deno.land/x/911@0.1.3/src/collection.ts
+[docs-fmt]: https://doc.deno.land/https://deno.land/x/911@0.1.3/src/fmt.ts
+[docs-json]: https://doc.deno.land/https://deno.land/x/911@0.1.3/src/json.ts
+[docs-log]: https://doc.deno.land/https://deno.land/x/911@0.1.3/src/log.ts
+[docs-math]: https://doc.deno.land/https://deno.land/x/911@0.1.3/src/math.ts
+[docs-date]: https://doc.deno.land/https://deno.land/x/911@0.1.3/src/date.ts
+[docs-memoize]: https://doc.deno.land/https://deno.land/x/911@0.1.3/src/memoize.ts
+[docs-serialize-map]: https://doc.deno.land/https://deno.land/x/911@0.1.3/src/serialize_map.ts
+[docs-serialize-set]: https://doc.deno.land/https://deno.land/x/911@0.1.3/src/serialize_set.ts
+[docs-params]: https://doc.deno.land/https://deno.land/x/911@0.1.3/src/params.ts
+[docs-promises]: https://doc.deno.land/https://deno.land/x/911@0.1.3/src/promises.ts
+[docs-state]: https://doc.deno.land/https://deno.land/x/911@0.1.3/src/state.ts
+[docs-throttle]: https://doc.deno.land/https://deno.land/x/911@0.1.3/src/throttle.ts
+[docs-type]: https://doc.deno.land/https://deno.land/x/911@0.1.3/src/type.ts
