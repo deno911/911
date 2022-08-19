@@ -1,23 +1,9 @@
-import {
-  aggregateGroups,
-  deepMerge as deeperMerge,
-  distinct,
-  distinctBy,
-  is,
-  mapNotNullish,
-  maxBy,
-  maxOf,
-  maxWith,
-  minBy,
-  minOf,
-  minWith,
-  partition as partitionBy,
-  sample,
-  unzip,
-  zip,
-} from "../deps.ts";
-import type { Arrayable, Nullable } from "./type.ts";
-import { clamp } from "./math.ts";
+// deno-lint-ignore-file ban-types no-explicit-any
+
+import { type Arrayable, is, type Nullable } from "./type.ts";
+import { clamp, randomInteger } from "./math.ts";
+
+const { hasOwn } = Object;
 
 /**
  * Convert `Arrayable<T>` to `Array<T>`
@@ -86,6 +72,70 @@ export function merge<T>(...args: Nullable<Arrayable<T>>[]): Array<T> {
   return args.flatMap((i) => toArray(i));
 }
 export { merge as mergeArrayable };
+
+// Copyright 2018-2022 the Deno authors. All rights reserved. MIT license.
+// This module is browser compatible.
+
+/**
+ * Returns a random element from the given array.
+ *
+ * Example:
+ *
+ * ```ts
+ * import { sample } from "https://deno.land/std@$STD_VERSION/collections/sample.ts"
+ * import { assert } from "https://deno.land/std@$STD_VERSION/testing/asserts.ts";
+ *
+ * const numbers = [1, 2, 3, 4];
+ * const random = sample(numbers);
+ *
+ * assert(numbers.includes(random as number));
+ * ```
+ */
+export function sample<T>(array: readonly T[]): T | undefined {
+  const length = array.length;
+  return length ? array[randomInteger(0, length - 1)] : undefined;
+}
+
+// Copyright 2018-2022 the Deno authors. All rights reserved. MIT license.
+// This module is browser compatible.
+
+/**
+ * Returns a new array, containing all elements in the given array transformed using the given transformer, except the ones
+ * that were transformed to `null` or `undefined`
+ *
+ * Example:
+ *
+ * ```ts
+ * import { mapNotNullish } from "https://deno.land/std@$STD_VERSION/collections/map_not_nullish.ts";
+ * import { assertEquals } from "https://deno.land/std@$STD_VERSION/testing/asserts.ts";
+ *
+ * const people = [
+ *     { middleName: null },
+ *     { middleName: 'William' },
+ *     { middleName: undefined },
+ *     { middleName: 'Martha' },
+ * ]
+ * const foundMiddleNames = mapNotNullish(people, it => it.middleName)
+ *
+ * assertEquals(foundMiddleNames, [ 'William', 'Martha' ])
+ * ```
+ */
+export function mapNotNullish<T, O>(
+  array: readonly T[],
+  transformer: (el: T) => O,
+): NonNullable<O>[] {
+  const ret: NonNullable<O>[] = [];
+
+  for (const element of array) {
+    const transformedElement = transformer(element);
+
+    if (transformedElement !== undefined && transformedElement !== null) {
+      ret.push(transformedElement as NonNullable<O>);
+    }
+  }
+
+  return ret;
+}
 
 /**
  * Partition Filter as used by the `partition` function.
@@ -160,6 +210,44 @@ export function partition<T>(
     result[i].push(e);
   });
   return result;
+}
+
+// Copyright 2018-2022 the Deno authors. All rights reserved. MIT license.
+// This module is browser compatible.
+
+/**
+ * Returns a tuple of two arrays with the first one containing all elements in the given array that match the given predicate
+ * and the second one containing all that do not
+ *
+ * Example:
+ *
+ * ```ts
+ * import { partitionBy } from "https://deno.land/x/911@0.1.3/src/collection.ts";
+ * import { assertEquals } from "https://deno.land/std@$STD_VERSION/testing/asserts.ts";
+ *
+ * const numbers = [ 5, 6, 7, 8, 9 ]
+ * const [ even, odd ] = partitionBy(numbers, it => it % 2 == 0)
+ *
+ * assertEquals(even, [ 6, 8 ])
+ * assertEquals(odd, [ 5, 7, 9 ])
+ * ```
+ */
+export function partitionBy<T>(
+  array: readonly T[],
+  predicate: (el: T) => boolean,
+): [T[], T[]] {
+  const matches: Array<T> = [];
+  const rest: Array<T> = [];
+
+  for (const element of array) {
+    if (predicate(element)) {
+      matches.push(element);
+    } else {
+      rest.push(element);
+    }
+  }
+
+  return [matches, rest];
 }
 
 /**
@@ -344,10 +432,10 @@ export function shuffle<T>(array: T[]): T[] {
 }
 
 // deno-lint-ignore-file ban-types
-export type DeepMerge<F, S> = MergeInsertions<
+export type DeeperMerge<F, S> = MergeInsertions<
   {
     [K in keyof F | keyof S]: K extends keyof S & keyof F
-      ? DeepMerge<F[K], S[K]>
+      ? DeeperMerge<F[K], S[K]>
       : K extends keyof S ? S[K]
       : K extends keyof F ? F[K]
       : never;
@@ -464,10 +552,10 @@ export function objectPick<O, T extends keyof O>(
  *
  * @category Object
  */
-export function deepMerge<T extends Record<string, any>, S = keyof T>(
+export function deeperMerge<T extends Record<string, any>, S = keyof T>(
   target: T,
   ...sources: S[]
-): DeepMerge<T, S> {
+): DeeperMerge<T, S> {
   if (!sources.length) {
     return target as any;
   }
@@ -483,7 +571,7 @@ export function deepMerge<T extends Record<string, any>, S = keyof T>(
           // @ts-expect-error
           target[key] = {};
         }
-        deepMerge(target[key], source[key]);
+        deeperMerge(target[key], source[key]);
       } else {
         // @ts-expect-error
         target[key] = source[key];
@@ -491,11 +579,11 @@ export function deepMerge<T extends Record<string, any>, S = keyof T>(
     });
   }
 
-  return deepMerge(target, ...sources);
+  return deeperMerge(target, ...sources);
 }
 
 function isMergableObject(item: any): item is Object {
-  return is.object(item) && !Array.isArray(item);
+  return is.object(item) && !is.array(item);
 }
 
 /**
@@ -533,6 +621,7 @@ export function assign<T extends {}, U, V>(
   source1: U,
   source2: V,
 ): asserts target is T & U & V;
+
 /**
  * Copy the values of all of the enumerable own properties from one or more
  * source objects to a target object. Returns the target object.
@@ -779,24 +868,17 @@ export function mapValues<T, O>(
  * @copyright 2018-2022 the Deno authors. All rights reserved.
  * @license MIT
  */
-export function mapEntries<
-  TK extends string,
-  TV extends any,
-  OK extends string = TK,
-  OV extends any = TV,
->(
-  record: Record<TK, TV>,
-  mapFn: (entry: [keyof TK, TV]) => [keyof OK, OV],
-): Record<OK, OV> {
-  const ret = {} as Record<OK, OV>;
-  const entries = Object.entries<TV>(record as Record<TK, TV>) as unknown as [
-    TK,
-    TV,
-  ][];
+export function mapEntries<T, O>(
+  record: Readonly<Record<string, T>>,
+  transformer: (entry: [string, T]) => [string, O],
+): Record<string, O> {
+  const ret: Record<string, O> = {};
+  const entries = Object.entries(record);
 
   for (const entry of entries) {
-    const [mappedKey, mappedValue] = mapFn(entry as any) as [OK, OV];
-    ret[mappedKey] = mappedValue as any;
+    const [mappedKey, mappedValue] = transformer(entry);
+
+    ret[mappedKey] = mappedValue;
   }
 
   return ret;
@@ -1024,7 +1106,7 @@ export function sortBy<T extends Record<string, any>>(
  * @category Collection
  * @example ```ts
  * import { union } from "https://deno.land/x/911@0.1.3/src/collection.ts";
- * import { assertEquals } from "https://deno.land/std@$STD_VERSION/testing/asserts.ts";
+ * import { assertEquals } from "https://deno.land/std@0.152.0/testing/asserts.ts";
  *
  * const soupIngredients = [ 'Pepper', 'Carrots', 'Leek' ]
  * const saladIngredients = [ 'Carrots', 'Radicchio', 'Pepper' ]
@@ -1049,7 +1131,7 @@ export function union<T>(...arrays: (readonly T[])[]): T[] {
  * @category Collection
  * @example ```ts
  * import { intersect } from "https://deno.land/x/911@0.1.3/src/collection.ts";
- * import { assertEquals } from "https://deno.land/std@$STD_VERSION/testing/asserts.ts";
+ * import { assertEquals } from "https://deno.land/std@0.152.0/testing/asserts.ts";
  *
  * const lisaInterests = [ 'Cooking', 'Music', 'Hiking' ]
  * const kimInterests = [ 'Music', 'Tennis', 'Cooking' ]
@@ -1080,7 +1162,7 @@ export function intersect<T>(...arrays: (readonly T[])[]): T[] {
  * @category Collection
  * @example ```ts
  * import { filterInPlace } from "https://deno.land/x/911@0.1.3/src/collection.ts";
- * import { assertEquals } from "https://deno.land/std@$STD_VERSION/testing/asserts.ts";
+ * import { assertEquals } from "https://deno.land/std@0.152.0/testing/asserts.ts";
  * const numbers = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]
  * filterInPlace(numbers, it => it % 2 === 0)
  * assertEquals(numbers, [ 2, 4, 6, 8, 10 ])
@@ -1118,30 +1200,894 @@ export function filterInPlace<T>(
  * ```
  */
 export function pick<
-  T extends any,
+  T extends object,
   K extends (keyof T & string),
 >(o: T, keys: K[]): Record<K, T[K]> {
   keys = keys.map((key) => (key as string).toLowerCase().trim() as K);
   return filterEntries<any>(
-    Object.assign<T, T>({} as T, is.object(o) ? o : {} as T),
+    Object.assign({} as T, is.object(o) ? o : {} as T),
     ([k, _v]: [string, T[K]]) => (keys as string[]).includes(k),
   ) as Record<K, T[K]>;
 }
 
-export {
-  aggregateGroups,
-  deeperMerge,
-  distinct,
-  distinctBy,
-  mapNotNullish,
-  maxBy,
-  maxOf,
-  maxWith,
-  minBy,
-  minOf,
-  minWith,
-  partitionBy,
-  sample,
-  unzip,
-  zip,
+// Copyright 2018-2022 the Deno authors. All rights reserved. MIT license.
+// This module is browser compatible.
+
+/**
+ * Returns the first element having the smallest value according to the provided comparator or undefined if there are no elements
+ *
+ * @example ```ts
+ * import { minWith } from "https://deno.land/x/911@0.1.3/src/collection.ts";
+ * import { assertEquals } from "https://deno.land/std@0.152.0/testing/asserts.ts";
+ *
+ * const people = ["Kim", "Anna", "John"];
+ * const smallestName = minWith(people, (a, b) => a.length - b.length);
+ *
+ * assertEquals(smallestName, "Kim");
+ * ```
+ */
+export function minWith<T>(
+  array: readonly T[],
+  comparator: (a: T, b: T) => number,
+): T | undefined {
+  let min: T | undefined = undefined;
+  let isFirst = true;
+
+  for (const current of array) {
+    if (isFirst || comparator(current, <T> min) < 0) {
+      min = current;
+      isFirst = false;
+    }
+  }
+
+  return min;
+}
+
+// Copyright 2018-2022 the Deno authors. All rights reserved. MIT license.
+// This module is browser compatible.
+/**
+ * Returns the first element that is the smallest value of the given function or undefined if there are no elements.
+ *
+ * @example ```ts
+ * import { minBy } from "https://deno.land/x/911@0.1.3/src/collection.ts";
+ * import { assertEquals } from "https://deno.land/std@0.152.0/testing/asserts.ts"
+ *
+ * const people = [
+ *     { name: 'Anna', age: 34 },
+ *     { name: 'Kim', age: 42 },
+ *     { name: 'John', age: 23 },
+ * ];
+ *
+ * const personWithMinAge = minBy(people, i => i.age);
+ *
+ * assertEquals(personWithMinAge, { name: 'John', age: 23 });
+ * ```
+ */
+export function minBy<T>(
+  array: readonly T[],
+  selector: (el: T) => number,
+): T | undefined;
+export function minBy<T>(
+  array: readonly T[],
+  selector: (el: T) => string,
+): T | undefined;
+export function minBy<T>(
+  array: readonly T[],
+  selector: (el: T) => bigint,
+): T | undefined;
+export function minBy<T>(
+  array: readonly T[],
+  selector: (el: T) => Date,
+): T | undefined;
+export function minBy<T>(
+  array: readonly T[],
+  selector:
+    | ((el: T) => number)
+    | ((el: T) => string)
+    | ((el: T) => bigint)
+    | ((el: T) => Date),
+): T | undefined {
+  let min: T | undefined = undefined;
+  let minValue: ReturnType<typeof selector> | undefined = undefined;
+
+  for (const current of array) {
+    const currentValue = selector(current);
+
+    if (minValue === undefined || currentValue < minValue) {
+      min = current;
+      minValue = currentValue;
+    }
+  }
+
+  return min;
+}
+
+// Copyright 2018-2022 the Deno authors. All rights reserved. MIT license.
+// This module is browser compatible.
+
+/**
+ * Applies the given selector to all elements of the given collection and
+ * returns the min value of all elements. If an empty array is provided the
+ * function will return undefined
+ *
+ * @example ```ts
+ * import { minOf } from "https://deno.land/std@0.152.0/collections/min_of.ts"
+ * import { assertEquals } from "https://deno.land/std@0.152.0/testing/asserts.ts"
+ *
+ * const inventory = [
+ *      { name: "mustard", count: 2 },
+ *      { name: "soy", count: 4 },
+ *      { name: "tomato", count: 32 },
+ * ];
+ * const minCount = minOf(inventory, (i) => i.count);
+ *
+ * assertEquals(minCount, 2);
+ * ```
+ */
+export function minOf<T>(
+  array: readonly T[],
+  selector: (el: T) => number,
+): number | undefined;
+
+export function minOf<T>(
+  array: readonly T[],
+  selector: (el: T) => bigint,
+): bigint | undefined;
+
+export function minOf<T, S extends ((el: T) => number) | ((el: T) => bigint)>(
+  array: readonly T[],
+  selector: S,
+): ReturnType<S> | undefined {
+  let minimumValue: ReturnType<S> | undefined = undefined;
+
+  for (const i of array) {
+    const currentValue = selector(i) as ReturnType<S>;
+
+    if (minimumValue === undefined || currentValue < minimumValue) {
+      minimumValue = currentValue;
+      continue;
+    }
+
+    if (Number.isNaN(currentValue)) {
+      return currentValue;
+    }
+  }
+
+  return minimumValue;
+}
+
+// Copyright 2018-2022 the Deno authors. All rights reserved. MIT license.
+// This module is browser compatible.
+/**
+ * Returns the first element having the largest value according to the provided
+ * comparator or undefined if there are no elements.
+ *
+ * The comparator is expected to work exactly like one passed to `Array.sort`, which means
+ * that `comparator(a, b)` should return a negative number if `a < b`, a positive number if `a > b`
+ * and `0` if `a == b`.
+ *
+ * @example ```ts
+ * import { maxWith } from "https://deno.land/std@0.152.0/collections/max_with.ts";
+ * import { assertEquals } from "https://deno.land/std@0.152.0/testing/asserts.ts";
+ *
+ * const people = ["Kim", "Anna", "John", "Arthur"];
+ * const largestName = maxWith(people, (a, b) => a.length - b.length);
+ *
+ * assertEquals(largestName, "Arthur");
+ * ```
+ */
+export function maxWith<T>(
+  array: readonly T[],
+  comparator: (a: T, b: T) => number,
+): T | undefined {
+  let max: T | undefined = undefined;
+  let isFirst = true;
+
+  for (const current of array) {
+    if (isFirst || comparator(current, <T> max) > 0) {
+      max = current;
+      isFirst = false;
+    }
+  }
+
+  return max;
+}
+
+// Copyright 2018-2022 the Deno authors. All rights reserved. MIT license.
+// This module is browser compatible.
+/**
+ * Applies the given selector to all elements of the given collection and
+ * returns the max value of all elements. If an empty array is provided the
+ * function will return undefined
+ *
+ * @example ```ts
+ * import { maxOf } from "https://deno.land/std@0.152.0/collections/max_of.ts"
+ * import { assertEquals } from "https://deno.land/std@0.152.0/testing/asserts.ts"
+ *
+ * const inventory = [
+ *      { name: "mustard", count: 2 },
+ *      { name: "soy", count: 4 },
+ *      { name: "tomato", count: 32 },
+ * ];
+ * const maxCount = maxOf(inventory, (i) => i.count);
+ *
+ * assertEquals(maxCount, 32);
+ * ```
+ */
+export function maxOf<T>(
+  array: readonly T[],
+  selector: (el: T) => number,
+): number | undefined;
+
+export function maxOf<T>(
+  array: readonly T[],
+  selector: (el: T) => bigint,
+): bigint | undefined;
+
+export function maxOf<T, S extends ((el: T) => number) | ((el: T) => bigint)>(
+  array: readonly T[],
+  selector: S,
+): ReturnType<S> | undefined {
+  let maximumValue: ReturnType<S> | undefined = undefined;
+
+  for (const i of array) {
+    const currentValue = selector(i) as ReturnType<S>;
+    if (maximumValue === undefined || currentValue > maximumValue) {
+      maximumValue = currentValue;
+      continue;
+    }
+    if (Number.isNaN(currentValue)) {
+      return currentValue;
+    }
+  }
+
+  return maximumValue;
+}
+
+// Copyright 2018-2022 the Deno authors. All rights reserved. MIT license.
+// This module is browser compatible.
+
+/**
+ * Returns the first element that is the largest value of the given function or
+ * undefined if there are no elements.
+ *
+ * @example ```ts
+ * import { maxBy } from "https://deno.land/std@0.152.0/collections/max_by.ts";
+ * import { assertEquals } from "https://deno.land/std@0.152.0/testing/asserts.ts";
+ *
+ * const people = [
+ *     { name: 'Anna', age: 34 },
+ *     { name: 'Kim', age: 42 },
+ *     { name: 'John', age: 23 },
+ * ];
+ *
+ * const personWithMaxAge = maxBy(people, i => i.age);
+ *
+ * assertEquals(personWithMaxAge, { name: 'Kim', age: 42 });
+ * ```
+ */
+export function maxBy<T>(
+  array: readonly T[],
+  selector: (el: T) => number,
+): T | undefined;
+export function maxBy<T>(
+  array: readonly T[],
+  selector: (el: T) => string,
+): T | undefined;
+export function maxBy<T>(
+  array: readonly T[],
+  selector: (el: T) => bigint,
+): T | undefined;
+export function maxBy<T>(
+  array: readonly T[],
+  selector: (el: T) => Date,
+): T | undefined;
+export function maxBy<T>(
+  array: readonly T[],
+  selector:
+    | ((el: T) => number)
+    | ((el: T) => string)
+    | ((el: T) => bigint)
+    | ((el: T) => Date),
+): T | undefined {
+  let max: T | undefined = undefined;
+  let maxValue: ReturnType<typeof selector> | undefined = undefined;
+
+  for (const current of array) {
+    const currentValue = selector(current);
+    if (maxValue === undefined || currentValue > maxValue) {
+      max = current;
+      maxValue = currentValue;
+    }
+  }
+  return max;
+}
+
+// Copyright 2018-2022 the Deno authors. All rights reserved. MIT license.
+// This module is browser compatible.
+
+/**
+ * Returns all distinct elements in the given array, preserving order by first occurrence
+ *
+ * Example:
+ *
+ * ```ts
+ * import { distinct } from "https://deno.land/x/911@0.1.3/src/collection.ts";
+ * import { assertEquals } from "https://deno.land/std@$STD_VERSION/testing/asserts.ts";
+ *
+ * const numbers = [ 3, 2, 5, 2, 5 ]
+ * const distinctNumbers = distinct(numbers)
+ *
+ * assertEquals(distinctNumbers, [ 3, 2, 5 ])
+ * ```
+ */
+export function distinct<T>(array: readonly T[]): T[] {
+  const set = new Set(array);
+
+  return Array.from(set);
+}
+
+// Copyright 2018-2022 the Deno authors. All rights reserved. MIT license.
+// This module is browser compatible.
+
+/**
+ * Returns all elements in the given array that produce a distinct value using the given selector, preserving order by first occurrence
+ *
+ * Example:
+ *
+ * ```ts
+ * import { distinctBy } from "https://deno.land/x/911@0.1.3/src/collection.ts";
+ * import { assertEquals } from "https://deno.land/std@$STD_VERSION/testing/asserts.ts";
+ *
+ * const names = [ 'Anna', 'Kim', 'Arnold', 'Kate' ]
+ * const exampleNamesByFirstLetter = distinctBy(names, it => it.charAt(0))
+ *
+ * assertEquals(exampleNamesByFirstLetter, [ 'Anna', 'Kim' ])
+ * ```
+ */
+export function distinctBy<T, D>(
+  array: readonly T[],
+  selector: (el: T) => D,
+): T[] {
+  const selectedValues = new Set<D>();
+  const ret: T[] = [];
+
+  for (const element of array) {
+    const currentSelectedValue = selector(element);
+
+    if (!selectedValues.has(currentSelectedValue)) {
+      selectedValues.add(currentSelectedValue);
+      ret.push(element);
+    }
+  }
+
+  return ret;
+}
+
+// Copyright 2018-2022 the Deno authors. All rights reserved. MIT license.
+// This module is browser compatible.
+
+/**
+ * Applies the given aggregator to each group in the given Grouping, returning the results together with the respective group keys
+ *
+ * ```ts
+ * import { aggregateGroups } from "https://deno.land/x/911@0.1.3/src/collection.ts";
+ * import { assertEquals } from "https://deno.land/std@$STD_VERSION/testing/asserts.ts";
+ *
+ * const foodProperties = {
+ *     'Curry': [ 'spicy', 'vegan' ],
+ *     'Omelette': [ 'creamy', 'vegetarian' ],
+ * }
+ * const descriptions = aggregateGroups(foodProperties,
+ *     (current, key, first, acc) => {
+ *         if (first)
+ *             return `${key} is ${current}`
+ *
+ *         return `${acc} and ${current}`
+ *     },
+ * )
+ *
+ * assertEquals(descriptions, {
+ *     'Curry': 'Curry is spicy and vegan',
+ *     'Omelette': 'Omelette is creamy and vegetarian',
+ * })
+ * ```
+ */
+export function aggregateGroups<T, A>(
+  record: Readonly<Record<string, Array<T>>>,
+  aggregator: (current: T, key: string, first: boolean, accumulator?: A) => A,
+): Record<string, A> {
+  return mapEntries(
+    record,
+    ([key, values]: [string, T[]]) => [
+      key,
+      // Need the type assertions here because the reduce type does not support the type transition we need
+      values.reduce(
+        (accumulator, current, currentIndex) =>
+          aggregator(current, key, currentIndex === 0, accumulator),
+        undefined as A | undefined,
+      ) as A,
+    ],
+  );
+}
+
+// Copyright 2018-2022 the Deno authors. All rights reserved. MIT license.
+// This module is browser compatible.
+
+/**
+ * How does recursive typing work?
+ *
+ * Deep merging process is handled through `DeepMerge<T, U, Options>` type.
+ * If both T and U are Records, we recursively merge them,
+ * else we treat them as primitives.
+ *
+ * Merging process is handled through `Merge<T, U>` type, in which
+ * we remove all maps, sets, arrays and records so we can handle them
+ * separately depending on merging strategy:
+ *
+ *    Merge<
+ *      {foo: string},
+ *      {bar: string, baz: Set<unknown>},
+ *    > // "foo" and "bar" will be handled with `MergeRightOmitComplexes`
+ *      // "baz" will be handled with `MergeAll*` type
+ *
+ * `MergeRightOmitComplexes<T, U>` will do the above: all T's
+ * exclusive keys will be kept, though common ones with U will have their
+ * typing overridden instead:
+ *
+ *    MergeRightOmitComplexes<
+ *      {foo: string, baz: number},
+ *      {foo: boolean, bar: string}
+ *    > // {baz: number, foo: boolean, bar: string}
+ *      // "baz" was kept from T
+ *      // "foo" was overridden by U's typing
+ *      // "bar" was added from U
+ *
+ * For Maps, Arrays, Sets and Records, we use `MergeAll*<T, U>` utility
+ * types. They will extract relevant data structure from both T and U
+ * (providing that both have same data data structure, except for typing).
+ *
+ * From these, `*ValueType<T>` will extract values (and keys) types to be
+ * able to create a new data structure with an union typing from both
+ * data structure of T and U:
+ *
+ *    MergeAllSets<{foo: Set<number>}, {foo: Set<string>}>
+ *      // `SetValueType` will extract "number" for T
+ *      // `SetValueType` will extract "string" for U
+ *      // `MergeAllSets` will infer type as Set<number|string>
+ *      // Process is similar for Maps, Arrays, and Sets
+ *
+ * `DeepMerge<T, U, Options>` is taking a third argument to be handle to
+ * infer final typing depending on merging strategy:
+ *
+ *    & (Options extends { sets: "replace" } ? PartialByType<U, Set<unknown>>
+ *      : MergeAllSets<T, U>)
+ *
+ * In the above line, if "Options" have its merging strategy for Sets set to
+ * "replace", instead of performing merging of Sets type, it will take the
+ * typing from right operand (U) instead, effectively replacing the typing.
+ *
+ * An additional note, we use `ExpandRecursively<T>` utility type to expand
+ * the resulting typing and hide all the typing logic of deep merging so it is
+ * more user friendly.
+ */
+
+/** Force intellisense to expand the typing to hide merging typings */
+type ExpandRecursively<T> = T extends Record<PropertyKey, unknown>
+  ? T extends infer O ? { [K in keyof O]: ExpandRecursively<O[K]> } : never
+  : T;
+
+/** Filter of keys matching a given type */
+type PartialByType<T, U> = {
+  [K in keyof T as T[K] extends U ? K : never]: T[K];
 };
+
+/** Get set values type */
+type SetValueType<T> = T extends Set<infer V> ? V : never;
+
+/** Merge all sets types definitions from keys present in both objects */
+type MergeAllSets<
+  T,
+  U,
+  X = PartialByType<T, Set<unknown>>,
+  Y = PartialByType<U, Set<unknown>>,
+  Z = {
+    [K in keyof X & keyof Y]: Set<SetValueType<X[K]> | SetValueType<Y[K]>>;
+  },
+> = Z;
+
+/** Get array values type */
+type ArrayValueType<T> = T extends Array<infer V> ? V : never;
+
+/** Merge all sets types definitions from keys present in both objects */
+type MergeAllArrays<
+  T,
+  U,
+  X = PartialByType<T, Array<unknown>>,
+  Y = PartialByType<U, Array<unknown>>,
+  Z = {
+    [K in keyof X & keyof Y]: Array<
+      ArrayValueType<X[K]> | ArrayValueType<Y[K]>
+    >;
+  },
+> = Z;
+
+/** Get map values types */
+type MapKeyType<T> = T extends Map<infer K, unknown> ? K : never;
+
+/** Get map values types */
+type MapValueType<T> = T extends Map<unknown, infer V> ? V : never;
+
+/** Merge all sets types definitions from keys present in both objects */
+type MergeAllMaps<
+  T,
+  U,
+  X = PartialByType<T, Map<unknown, unknown>>,
+  Y = PartialByType<U, Map<unknown, unknown>>,
+  Z = {
+    [K in keyof X & keyof Y]: Map<
+      MapKeyType<X[K]> | MapKeyType<Y[K]>,
+      MapValueType<X[K]> | MapValueType<Y[K]>
+    >;
+  },
+> = Z;
+
+/** Merge all records types definitions from keys present in both objects */
+type MergeAllRecords<
+  T,
+  U,
+  Options,
+  X = PartialByType<T, Record<PropertyKey, unknown>>,
+  Y = PartialByType<U, Record<PropertyKey, unknown>>,
+  Z = {
+    [K in keyof X & keyof Y]: DeepMerge<X[K], Y[K], Options>;
+  },
+> = Z;
+
+/** Exclude map, sets and array from type */
+type OmitComplexes<T> = Omit<
+  T,
+  keyof PartialByType<
+    T,
+    | Map<unknown, unknown>
+    | Set<unknown>
+    | Array<unknown>
+    | Record<PropertyKey, unknown>
+  >
+>;
+
+/** Object with keys in either T or U but not in both */
+type ObjectXorKeys<
+  T,
+  U,
+  X = Omit<T, keyof U> & Omit<U, keyof T>,
+  Y = { [K in keyof X]: X[K] },
+> = Y;
+
+/** Merge two objects, with left precedence */
+type MergeRightOmitComplexes<
+  T,
+  U,
+  X = ObjectXorKeys<T, U> & OmitComplexes<{ [K in keyof U]: U[K] }>,
+> = X;
+
+/** Merge two objects */
+type Merge<
+  T,
+  U,
+  Options,
+  X =
+    & MergeRightOmitComplexes<T, U>
+    & MergeAllRecords<T, U, Options>
+    & (Options extends { sets: "replace" } ? PartialByType<U, Set<unknown>>
+      : MergeAllSets<T, U>)
+    & (Options extends { arrays: "replace" } ? PartialByType<U, Array<unknown>>
+      : MergeAllArrays<T, U>)
+    & (Options extends { maps: "replace" }
+      ? PartialByType<U, Map<unknown, unknown>>
+      : MergeAllMaps<T, U>),
+> = ExpandRecursively<X>;
+
+/**
+ * Merges the two given Records, recursively merging any nested Records with
+ * the second collection overriding the first in case of conflict
+ *
+ * For arrays, maps and sets, a merging strategy can be specified to either
+ * "replace" values, or "merge" them instead.
+ * Use "includeNonEnumerable" option to include non enumerable properties too.
+ *
+ * Example:
+ *
+ * ```ts
+ * import { deepMerge } from "https://deno.land/std@$STD_VERSION/collections/deep_merge.ts";
+ * import { assertEquals } from "https://deno.land/std@$STD_VERSION/testing/asserts.ts";
+ *
+ * const a = {foo: true}
+ * const b = {foo: {bar: true}}
+ *
+ * assertEquals(deepMerge(a, b), {foo: {bar: true}});
+ * ```
+ */
+export function deepMerge<
+  T extends Record<PropertyKey, unknown>,
+>(
+  record: Partial<Readonly<T>>,
+  other: Partial<Readonly<T>>,
+  options?: Readonly<DeepMergeOptions>,
+): T;
+
+export function deepMerge<
+  T extends Record<PropertyKey, unknown>,
+  U extends Record<PropertyKey, unknown>,
+  Options extends DeepMergeOptions,
+>(
+  record: Readonly<T>,
+  other: Readonly<U>,
+  options?: Readonly<Options>,
+): DeepMerge<T, U, Options>;
+
+export function deepMerge<
+  T extends Record<PropertyKey, unknown>,
+  U extends Record<PropertyKey, unknown>,
+  Options extends DeepMergeOptions = {
+    arrays: "merge";
+    sets: "merge";
+    maps: "merge";
+  },
+>(
+  record: Readonly<T>,
+  other: Readonly<U>,
+  options?: Readonly<Options>,
+): DeepMerge<T, U, Options> {
+  return deepMergeInternal(record, other, new Set(), options);
+}
+
+function deepMergeInternal<
+  T extends Record<PropertyKey, unknown>,
+  U extends Record<PropertyKey, unknown>,
+  Options extends DeepMergeOptions = {
+    arrays: "merge";
+    sets: "merge";
+    maps: "merge";
+  },
+>(
+  record: Readonly<T>,
+  other: Readonly<U>,
+  seen: Set<NonNullable<object>>,
+  options?: Readonly<Options>,
+) {
+  // Extract options
+  // Clone left operand to avoid performing mutations in-place
+  type Result = DeepMerge<T, U, Options>;
+  const result: Partial<Result> = {};
+
+  const keys = new Set([
+    ...getKeys(record),
+    ...getKeys(other),
+  ]) as Set<keyof Result>;
+
+  // Iterate through each key of other object and use correct merging strategy
+  for (const key of keys) {
+    // Skip to prevent Object.prototype.__proto__ accessor property calls on non-Deno platforms
+    if (key === "__proto__") {
+      continue;
+    }
+
+    type ResultMember = Result[typeof key];
+
+    const a = record[key] as ResultMember;
+
+    if (!hasOwn(other, key)) {
+      result[key] = a;
+
+      continue;
+    }
+
+    const b = other[key] as ResultMember;
+
+    if (
+      isNonNullObject(a) && isNonNullObject(b) && !seen.has(a) && !seen.has(b)
+    ) {
+      seen.add(a);
+      seen.add(b);
+      result[key] = mergeObjects(a, b, seen, options) as ResultMember;
+
+      continue;
+    }
+
+    // Override value
+    result[key] = b;
+  }
+
+  return result as Result;
+}
+
+function mergeObjects(
+  left: Readonly<NonNullable<object>>,
+  right: Readonly<NonNullable<object>>,
+  seen: Set<NonNullable<object>>,
+  options: Readonly<DeepMergeOptions> = {
+    arrays: "merge",
+    sets: "merge",
+    maps: "merge",
+  },
+): Readonly<NonNullable<object>> {
+  // Recursively merge mergeable objects
+  if (isMergeable(left) && isMergeable(right)) {
+    return deepMergeInternal(left, right, seen);
+  }
+
+  if (isIterable(left) && isIterable(right)) {
+    // Handle arrays
+    if ((Array.isArray(left)) && (Array.isArray(right))) {
+      if (options.arrays === "merge") {
+        return left.concat(right);
+      }
+
+      return right;
+    }
+
+    // Handle maps
+    if ((left instanceof Map) && (right instanceof Map)) {
+      if (options.maps === "merge") {
+        return new Map([
+          ...left,
+          ...right,
+        ]);
+      }
+
+      return right;
+    }
+
+    // Handle sets
+    if ((left instanceof Set) && (right instanceof Set)) {
+      if (options.sets === "merge") {
+        return new Set([
+          ...left,
+          ...right,
+        ]);
+      }
+
+      return right;
+    }
+  }
+
+  return right;
+}
+
+/**
+ * Test whether a value is mergeable or not
+ * Builtins that look like objects, null and user defined classes
+ * are not considered mergeable (it means that reference will be copied)
+ */
+function isMergeable(
+  value: NonNullable<object>,
+): value is Record<PropertyKey, unknown> {
+  return Object.getPrototypeOf(value) === Object.prototype;
+}
+
+function isIterable(
+  value: NonNullable<object>,
+): value is Iterable<unknown> {
+  return typeof (value as Iterable<unknown>)[Symbol.iterator] === "function";
+}
+
+function isNonNullObject(value: unknown): value is NonNullable<object> {
+  return value !== null && typeof value === "object";
+}
+
+function getKeys<T extends object>(record: T): Array<keyof T> {
+  const ret = Object.getOwnPropertySymbols(record) as Array<keyof T>;
+  filterInPlace(
+    ret,
+    (key) => Object.prototype.propertyIsEnumerable.call(record, key),
+  );
+  ret.push(...(Object.keys(record) as Array<keyof T>));
+
+  return ret;
+}
+
+/** Merging strategy */
+export type MergingStrategy = "replace" | "merge";
+
+/** Deep merge options */
+export type DeepMergeOptions = {
+  /** Merging strategy for arrays */
+  arrays?: MergingStrategy;
+  /** Merging strategy for Maps */
+  maps?: MergingStrategy;
+  /** Merging strategy for Sets */
+  sets?: MergingStrategy;
+};
+
+/** Merge deeply two objects */
+export type DeepMerge<
+  T,
+  U,
+  Options = Record<string, MergingStrategy>,
+> =
+  // Handle objects
+  [T, U] extends [Record<PropertyKey, unknown>, Record<PropertyKey, unknown>]
+    ? Merge<T, U, Options>
+    : // Handle primitives
+    T | U;
+
+// Copyright 2018-2022 the Deno authors. All rights reserved. MIT license.
+// This module is browser compatible.
+
+/**
+ * Builds two separate arrays from the given array of 2-tuples, with the first returned array holding all first
+ * tuple elements and the second one holding all the second elements
+ *
+ * Example:
+ *
+ * ```ts
+ * import { unzip } from "https://deno.land/std@$STD_VERSION/collections/unzip.ts";
+ * import { assertEquals } from "https://deno.land/std@$STD_VERSION/testing/asserts.ts";
+ *
+ * const parents = [
+ *     [ 'Maria', 'Jeff' ],
+ *     [ 'Anna', 'Kim' ],
+ *     [ 'John', 'Leroy' ],
+ * ] as [string, string][];
+ *
+ * const [ moms, dads ] = unzip(parents);
+ *
+ * assertEquals(moms, [ 'Maria', 'Anna', 'John' ]);
+ * assertEquals(dads, [ 'Jeff', 'Kim', 'Leroy' ]);
+ * ```
+ */
+export function unzip<T, U>(pairs: readonly [T, U][]): [T[], U[]] {
+  const { length } = pairs;
+  const ret: [T[], U[]] = [
+    Array.from({ length }),
+    Array.from({ length }),
+  ];
+
+  pairs.forEach(([first, second], index) => {
+    ret[0][index] = first;
+    ret[1][index] = second;
+  });
+
+  return ret;
+}
+
+// Copyright 2018-2022 the Deno authors. All rights reserved. MIT license.
+// This module is browser compatible.
+
+/**
+ * Builds N-tuples of elements from the given N arrays with matching indices, stopping when the smallest array's end is reached
+ * Example:
+ *
+ * ```ts
+ * import { zip } from "https://deno.land/std@$STD_VERSION/collections/zip.ts";
+ * import { assertEquals } from "https://deno.land/std@$STD_VERSION/testing/asserts.ts";
+ *
+ * const numbers = [ 1, 2, 3, 4 ];
+ * const letters = [ 'a', 'b', 'c', 'd' ];
+ * const pairs = zip(numbers, letters);
+ *
+ * assertEquals(pairs, [
+ *     [ 1, 'a' ],
+ *     [ 2, 'b' ],
+ *     [ 3, 'c' ],
+ *     [ 4, 'd' ],
+ * ]);
+ * ```
+ */
+
+export function zip<T extends unknown[]>(
+  ...arrays: { [K in keyof T]: T[K][] }
+): T[] {
+  let minLength = minOf(arrays, (it) => it.length);
+  if (minLength === undefined) minLength = 0;
+
+  const ret: T[] = new Array(minLength);
+
+  for (let i = 0; i < minLength; i += 1) {
+    const arr = arrays.map((it) => it[i]);
+    ret[i] = arr as T;
+  }
+
+  return ret;
+}

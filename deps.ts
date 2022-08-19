@@ -1,20 +1,3 @@
-// collection.ts
-export { aggregateGroups } from "https://deno.land/std@0.152.0/collections/aggregate_groups.ts";
-export { deepMerge } from "https://deno.land/std@0.152.0/collections/deep_merge.ts";
-export { distinct } from "https://deno.land/std@0.152.0/collections/distinct.ts";
-export { distinctBy } from "https://deno.land/std@0.152.0/collections/distinct_by.ts";
-export { mapNotNullish } from "https://deno.land/std@0.152.0/collections/map_not_nullish.ts";
-export { maxBy } from "https://deno.land/std@0.152.0/collections/max_by.ts";
-export { maxOf } from "https://deno.land/std@0.152.0/collections/max_of.ts";
-export { maxWith } from "https://deno.land/std@0.152.0/collections/max_with.ts";
-export { minBy } from "https://deno.land/std@0.152.0/collections/min_by.ts";
-export { minOf } from "https://deno.land/std@0.152.0/collections/min_of.ts";
-export { minWith } from "https://deno.land/std@0.152.0/collections/min_with.ts";
-export { partition } from "https://deno.land/std@0.152.0/collections/partition.ts";
-export { sample } from "https://deno.land/std@0.152.0/collections/sample.ts";
-export { unzip } from "https://deno.land/std@0.152.0/collections/unzip.ts";
-export { zip } from "https://deno.land/std@0.152.0/collections/zip.ts";
-
 // fmt.ts
 export * as ansi from "https://deno.land/std@0.152.0/fmt/colors.ts";
 export { prettyBytes } from "https://deno.land/std@0.152.0/fmt/bytes.ts";
