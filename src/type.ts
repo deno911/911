@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-explicit-any ban-types
 import { type Assert, assert as isAssert, is } from "../deps.ts";
 export { is };
 

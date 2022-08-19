@@ -1,3 +1,13 @@
+// deno-lint-ignore-file no-explicit-any
+/// <reference no-default-lib="true"/>
+/// <reference lib="dom" />
+/// <reference lib="dom.iterable" />
+/// <reference lib="deno.ns" />
+/// <reference lib="deno.window" />
+/// <reference lib="esnext" />
+/// <reference types="../types.d.ts" />
+/// <reference types="./type.ts" />
+
 import { decode } from "./fmt.ts";
 import { is } from "./type.ts";
 import { removeEmptyValues } from "./collection.ts";
@@ -24,8 +34,8 @@ export class Params extends URLSearchParams {
     return this;
   }
 
-  toObject(): Obj {
-    return Params.toObject(this);
+  toObject<T extends Obj>(): T {
+    return Params.toObject<T>(this);
   }
 
   /**
@@ -65,10 +75,6 @@ export class Params extends URLSearchParams {
     } catch {
       return 0;
     }
-  }
-
-  get length(): number {
-    return this.size;
   }
 
   getAll(names: string | string[]) {

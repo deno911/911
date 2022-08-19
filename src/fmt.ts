@@ -1,3 +1,4 @@
+// deno-lint-ignore-file no-explicit-any
 import {
   camelCase,
   constantCase,
@@ -12,13 +13,7 @@ import {
   upperCase,
 } from "../deps.ts";
 
-export {
-  ansi,
-  prettyBytes,
-  type PrettyBytesOptions,
-  printf,
-  sprintf,
-} from "../deps.ts";
+export { ansi, prettyBytes, printf, sprintf } from "../deps.ts";
 
 export {
   camelCase,
@@ -189,7 +184,7 @@ export class Templette {
   static compile(template: string, values: Values): string {
     return template.replace(
       /[{]{1,3}\s*(.*?)\s*[}]{1,3}/g,
-      (x: string | number, key: string | any, y: any) => {
+      (x: string | number, key: any, y: any) => {
         (x = 0), (y = values);
         key = key.trim().split(".");
         while (y && x < key.length) {

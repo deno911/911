@@ -1,4 +1,15 @@
+/// <reference no-default-lib="true" />
+/// <reference lib="esnext" />
+/// <reference lib="deno.ns" />
+/// <reference lib="deno.window" />
+/// <reference lib="dom" />
+/// <reference types="../types.d.ts" />
+/// <reference types="./type.ts" />
+
+// deno-lint-ignore-file no-explicit-any
+
 import { Status, STATUS_TEXT } from "./http.ts";
+import { log } from "./log.ts";
 
 export declare type JSONReplacerFn = (
   this: any,
@@ -51,13 +62,13 @@ export function json<T extends any>(data: T, {
   replacer,
   space,
   ...init
-}?: Partial<JSONInit>): Response;
+}: Partial<JSONInit>): Response;
 
 export function json<T extends any>(data: T, {
   replacer,
   space,
   ...init
-}?: Partial<JSONInitAlt>): Response;
+}: Partial<JSONInitAlt>): Response;
 
 export function json<T extends any>(data: T, {
   replacer,
@@ -83,13 +94,41 @@ export function json<T extends any>(data: T, {
   });
 
   const {
-    statusText = STATUS_TEXT.get(`${init?.status ?? Status.OK}`),
-  } = init?.statusText;
+    status = Status.OK,
+    statusText = STATUS_TEXT.get(`${status}`),
+  } = init;
 
-  return new Response(body, {
-    ...init,
-    statusText,
-    status: init?.status ?? Status.OK,
-    headers,
-  });
+  return new Response(body, { ...init, statusText, status, headers });
+}
+
+function safeJsonParse<T extends any>(data: string): T | undefined {
+  try {
+    return JSON.parse(data);
+  } catch (e) {
+    log.error("Unable to parse JSON!", e.toString());
+    return undefined;
+  }
+}
+
+export function jsonParse<T extends any>(data: string): T | undefined {
+  return safeJsonParse<T>(data);
+}
+
+function safeJsonStringify<T extends any>(
+  data: T,
+  space: string | number = 0,
+): string | undefined {
+  try {
+    return JSON.stringify(data, undefined, space);
+  } catch (e) {
+    log.error("Unable to stringify JSON!", e.toString());
+    return "";
+  }
+}
+
+export function jsonStringify<T extends any>(
+  data: T,
+  space: string | number = 0,
+): string | undefined {
+  return safeJsonStringify<T>(data, space);
 }

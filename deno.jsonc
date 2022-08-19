@@ -16,7 +16,7 @@
     "types": [
       "./types.d.ts"
     ],
-    "strict": true,
+    "strict": false,
     "strictNullChecks": false,
     "keyofStringsOnly": true
   },
@@ -26,7 +26,8 @@
         "no-explicit-any",
         "ban-types",
         "ban-ts-comment",
-        "no-unused-vars"
+        "no-unused-vars",
+        "no-var"
       ]
     },
     "files": {
@@ -34,7 +35,8 @@
         ".devcontainer",
         ".vscode",
         ".git*",
-        "*_test.ts"
+        "*_test.ts",
+        "*.js"
       ]
     }
   },

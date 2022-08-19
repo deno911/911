@@ -1,27 +1,32 @@
 // collection.ts
-export * from "https://deno.land/std@0.152.0/collections/aggregate_groups.ts";
-export * from "https://deno.land/std@0.152.0/collections/deep_merge.ts";
-export * from "https://deno.land/std@0.152.0/collections/distinct.ts";
-export * from "https://deno.land/std@0.152.0/collections/distinct_by.ts";
-export * from "https://deno.land/std@0.152.0/collections/map_not_nullish.ts";
-export * from "https://deno.land/std@0.152.0/collections/max_by.ts";
-export * from "https://deno.land/std@0.152.0/collections/max_of.ts";
-export * from "https://deno.land/std@0.152.0/collections/max_with.ts";
-export * from "https://deno.land/std@0.152.0/collections/min_by.ts";
-export * from "https://deno.land/std@0.152.0/collections/min_of.ts";
-export * from "https://deno.land/std@0.152.0/collections/min_with.ts";
-export * from "https://deno.land/std@0.152.0/collections/partition.ts";
-export * from "https://deno.land/std@0.152.0/collections/sample.ts";
-export * from "https://deno.land/std@0.152.0/collections/unzip.ts";
-export * from "https://deno.land/std@0.152.0/collections/zip.ts";
+export { aggregateGroups } from "https://deno.land/std@0.152.0/collections/aggregate_groups.ts";
+export { deepMerge } from "https://deno.land/std@0.152.0/collections/deep_merge.ts";
+export { distinct } from "https://deno.land/std@0.152.0/collections/distinct.ts";
+export { distinctBy } from "https://deno.land/std@0.152.0/collections/distinct_by.ts";
+export { mapNotNullish } from "https://deno.land/std@0.152.0/collections/map_not_nullish.ts";
+export { maxBy } from "https://deno.land/std@0.152.0/collections/max_by.ts";
+export { maxOf } from "https://deno.land/std@0.152.0/collections/max_of.ts";
+export { maxWith } from "https://deno.land/std@0.152.0/collections/max_with.ts";
+export { minBy } from "https://deno.land/std@0.152.0/collections/min_by.ts";
+export { minOf } from "https://deno.land/std@0.152.0/collections/min_of.ts";
+export { minWith } from "https://deno.land/std@0.152.0/collections/min_with.ts";
+export { partition } from "https://deno.land/std@0.152.0/collections/partition.ts";
+export { sample } from "https://deno.land/std@0.152.0/collections/sample.ts";
+export { unzip } from "https://deno.land/std@0.152.0/collections/unzip.ts";
+export { zip } from "https://deno.land/std@0.152.0/collections/zip.ts";
 
 // fmt.ts
 export * as ansi from "https://deno.land/std@0.152.0/fmt/colors.ts";
-export * from "https://deno.land/std@0.152.0/fmt/bytes.ts";
-export * from "https://deno.land/std@0.152.0/fmt/printf.ts";
+export { prettyBytes } from "https://deno.land/std@0.152.0/fmt/bytes.ts";
+export { printf, sprintf } from "https://deno.land/std@0.152.0/fmt/printf.ts";
 
 // is
-export * from "https://deno.land/x/dis@0.0.1/mod.ts";
+export {
+  type Assert,
+  assert,
+  AssertionTypeDescription,
+  is,
+} from "https://deno.land/x/dis@0.0.1/mod.ts";
 
 // p-limit
 export * from "https://deno.land/x/p_limit@v1.0.0/mod.ts";
@@ -65,11 +70,9 @@ export { contentType as getContentType } from "https://deno.land/std@0.152.0/med
 export * as path from "https://deno.land/std@0.152.0/path/mod.ts";
 
 // preact
-export * from "https://x.lcas.dev/preact@10.5.12/mod.js";
-export * from "https://x.lcas.dev/preact@10.5.12/mod.d.ts";
+export * from "https://esm.sh/preact@10.10.1?target=deno";
+// export * from "https://x.lcas.dev/preact@10.5.12/jsx.d.ts";
 export { render as renderToString } from "https://esm.sh/preact-render-to-string@5.2.1?target=deno";
 
 // docs
 export { doc } from "https://deno.land/x/deno_doc@0.39.0/mod.ts";
-// export * from "https://deno.land/x/deno_doc_components@0.1.1/doc.ts";
-export * from "https://deno.land/x/deno_doc@0.39.0/lib/types.d.ts";

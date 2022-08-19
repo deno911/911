@@ -4,7 +4,7 @@
  * adds a `sort` method, getter/setters for `size`, a `toString` method, and
  * some internal Symbol properties.
  * @example ```ts
- * import { SerializeMap } from "./serialize_map.ts";
+ * import { SerializeMap } from "https://deno.land/x/911@0.1.2/src/serialize_map.ts";
  *
  * const bad = new Map([
  *  ["1", "one"],
@@ -24,7 +24,7 @@
  * // (serialized into a valid JSON object)
  *
  * ```
- * @see {@link https://deno.land/x/911@0.1.2/src/serialize_map.ts}
+ * @link https://deno.land/x/911@0.1.2/src/serialize_map.ts
  * @author Nicholas Berlette <https://github.com/nberlette>
  * @license MIT
  */
@@ -48,7 +48,7 @@ export class SerializeMap<T extends any> extends Map<string, T> {
   }
 
   toJSON() {
-    return Object.fromEntries<T>(this.entries?.());
+    return Object.fromEntries<T>(this);
   }
 
   toString(): string {

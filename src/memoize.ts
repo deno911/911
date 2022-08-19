@@ -1,3 +1,13 @@
+// deno-lint-ignore-file no-explicit-any
+/// <reference no-default-lib="true"/>
+/// <reference lib="dom" />
+/// <reference lib="dom.iterable" />
+/// <reference lib="deno.ns" />
+/// <reference lib="deno.window" />
+/// <reference lib="esnext" />
+/// <reference types="../types.d.ts" />
+/// <reference types="./type.ts" />
+
 export interface MemoizeOptions<A extends unknown[], R> {
   /**
    * Provides a single value to use as the Key for the memoization.
@@ -65,14 +75,15 @@ export const defaultOptions = {
  */
 export function memoize<
   A extends unknown[],
-  R extends unknown,
-  T extends unknown,
+  R,
+  T,
 >(
   fn: MemoizableFn<A, R, T>,
   opts: MemoizeOptions<A, R> = defaultOptions,
 ): MemoizableFn<A, R, T> {
   opts = Object.assign({}, defaultOptions, opts);
-  const { hash, cache } = opts;
+  const hash = opts?.hash ?? defaultOptions.hash;
+  const cache = opts?.cache ?? defaultOptions.cache;
 
   return function (this: T, ...args: A) {
     const id = hash.apply(this, args);
@@ -84,7 +95,7 @@ export function memoize<
       result = result.catch((error: any) => {
         cache.delete(id);
         throw error;
-      }) as R;
+      }) as Awaited<Promise<any>>;
     }
     cache.set(id, result);
     return result;

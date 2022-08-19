@@ -12,10 +12,10 @@ import {
   dim as d,
   italic as i,
   underline as u,
-} from "https://deno.land/std@0.151.0/fmt/colors.ts";
-import { prettyBytes as human } from "https://deno.land/std@0.151.0/fmt/bytes.ts";
-import { ensureFile } from "https://deno.land/std@0.151.0/fs/ensure_file.ts";
-import { expandGlob as glob } from "https://deno.land/std@0.151.0/fs/expand_glob.ts";
+} from "https://deno.land/std@0.152.0/fmt/colors.ts";
+import { prettyBytes as human } from "https://deno.land/std@0.152.0/fmt/bytes.ts";
+import { ensureFile } from "https://deno.land/std@0.152.0/fs/ensure_file.ts";
+import { expandGlob as glob } from "https://deno.land/std@0.152.0/fs/expand_glob.ts";
 import { log } from "./src/log.ts";
 
 /**
@@ -34,7 +34,7 @@ export const [VERSION = "0.0.0"] = VERSIONS;
  */
 export async function prepublish(version: string) {
   await bump("./{README.md,LICENSE}", version);
-  await bump("./{lib,src}/**/*.{js,jsx,ts,tsx}", version);
+  await bump("./{lib,src,tests}/**/*.{mjs,js,jsx,ts,tsx}", version);
   await writeJson(version);
   // return false; // return a falsey value to prevent publishing.
 }

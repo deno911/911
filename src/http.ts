@@ -1,8 +1,12 @@
+// deno-lint-ignore-file no-explicit-any
 /// <reference no-default-lib="true"/>
 /// <reference lib="dom" />
 /// <reference lib="dom.iterable" />
-/// <reference lib="dom.asynciterable" />
 /// <reference lib="deno.ns" />
+/// <reference lib="deno.window" />
+/// <reference lib="esnext" />
+/// <reference types="../types.d.ts" />
+/// <reference types="./type.ts" />
 
 import { log } from "./log.ts";
 import { CACHE_MAX_SIZE, globalCache } from "./cache.ts";
@@ -22,7 +26,7 @@ import {
   type VNode,
 } from "../deps.ts";
 
-export const STATUS_TEXT = new Map<string, any>(
+export const STATUS_TEXT = new Map<string, string>(
   Object.entries(STATUS_TEXT_ENUM),
 );
 
@@ -232,7 +236,7 @@ export function serveStatic(
       if (cache) {
         // We don't want to cache if the resource size if greater than 10MB.
         // The size is arbitrary choice.
-        if (+(response.headers.get("content-length")) < CACHE_MAX_SIZE) {
+        if (+(response.headers.get("content-length")!) < CACHE_MAX_SIZE) {
           await globalCache.put(request, response);
         }
       }
@@ -409,7 +413,7 @@ export async function toResponse(
   }: ResponseInit & ResponseProps = {},
 ): Promise<Response> {
   const _headers = new Headers(headers ?? {});
-  if (_headers.get("Content-Type").includes("json")) {
+  if (_headers.get("Content-Type")!.includes("json")) {
     return json(data, { status, ...init });
   }
   return new Response(data, {

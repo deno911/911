@@ -3,10 +3,22 @@
  * for `size`, a `toString` method, and a `toJSON` method. Serializes into a
  * valid `JSON` array when passed to `JSON.stringify` (rather than `{}`, like
  * its simple-minded cousin, Set).
- * @example JSON.stringify(new SerializeSet([1, 1, 2, 3]));
- * // [1, 2, 3] - serialized into a valid JSON array
- * @example JSON.stringify(new Set([1, 2, 2, 3]));
- * // {} - standard Set does *not* serialize into JSON
+ * @example ```ts
+ * import { SerializeSet } from "https://deno.land/x/911@0.1.2/src/serialize_set.ts";
+ *
+ * const bad = new Set([1, 2, 3]);
+ *
+ * // The problem: Set does not play well with JSON
+ * JSON.stringify(bad);
+ * // {}
+ *
+ * // But if we re-initialize into a SerializeSet...
+ * const good = new SerializeSet(bad);
+ *
+ * // ...we get a valid JSON array, and our headache is gone!
+ * JSON.stringify(good);
+ * // [1, 2, 3]
+ * ```
  * @see {@link https://deno.land/x/911@0.1.2/src/serialize_set.ts}
  * @author Nicholas Berlette <https://github.com/nberlette>
  * @license MIT

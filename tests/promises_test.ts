@@ -8,7 +8,6 @@ import {
   createPromiseLock,
   createSingletonPromise,
   p,
-  PInstance,
 } from "../src/promises.ts";
 import { assert } from "../deps_test.ts";
 
