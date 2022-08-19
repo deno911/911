@@ -21,7 +21,7 @@ export function toArray<T>(array?: Nullable<Arrayable<T>>): Array<T> {
 /**
  * Convert `Arrayable<T>`, `Iterable<T>`, etc. to a normalized `Array<T>`.
  * @example ```ts
- * import { toArray } from "https://deno.land/x/911@0.1.3/src/collection.ts";
+ * import { toArray } from "https://deno.land/x/911@0.1.4/src/collection.ts";
  *
  * toArray([1, 2, 3]); // [1, 2, 3]
  * toArray(new Set([1, 2, 3])); // [1, 2, 3]
@@ -45,7 +45,7 @@ export function ensureArray<T>(
  * Convert `Arrayable<T>` to `Array<T>` and flatten it
  * @category Collection
  * @example ```ts
- * import { flatten } from "https://deno.land/x/911@0.1.3/src/collection.ts";
+ * import { flatten } from "https://deno.land/x/911@0.1.4/src/collection.ts";
  *
  * flatten([1, 2, 3]); // [1, 2, 3]
  * flatten([[1, 2], [3, 4]]); // [1, 2, 3, 4]
@@ -62,7 +62,7 @@ export { flatten as flattenArrayable };
  * Use rest arguments to merge arrays
  * @category Collection
  * @example ```ts
- * import { merge } from "https://deno.land/x/911@0.1.3/src/collection.ts";
+ * import { merge } from "https://deno.land/x/911@0.1.4/src/collection.ts";
  *
  * merge([1, 2, 3], [4, 5, 6]); // [1, 2, 3, 4, 5, 6]
  * ```
@@ -148,7 +148,7 @@ export type PartitionFilter<T> = (i: T, idx: number, arr: readonly T[]) => any;
  * Divide an array into two parts by a filter function
  * @category Collection
  * @example ```ts
- * import { partition } from "https://deno.land/x/911@0.1.3/src/collection.ts";
+ * import { partition } from "https://deno.land/x/911@0.1.4/src/collection.ts";
  *
  * partition([1, 2, 3, 4], i => i % 2 != 0); // [[1, 3], [2, 4]]
  * ```
@@ -222,7 +222,7 @@ export function partition<T>(
  * Example:
  *
  * ```ts
- * import { partitionBy } from "https://deno.land/x/911@0.1.3/src/collection.ts";
+ * import { partitionBy } from "https://deno.land/x/911@0.1.4/src/collection.ts";
  * import { assertEquals } from "https://deno.land/std@$STD_VERSION/testing/asserts.ts";
  *
  * const numbers = [ 5, 6, 7, 8, 9 ]
@@ -311,7 +311,7 @@ export function at<T>(array: readonly T[] | [], index: number): T | undefined {
  * Generate a range array of numbers. The `stop` is exclusive.
  * @category Collection
  * @example ```ts
- * import { range } from "https://deno.land/x/911@0.1.3/src/collection.ts";
+ * import { range } from "https://deno.land/x/911@0.1.4/src/collection.ts";
  *
  * range(0, 5); // [0, 1, 2, 3, 4]
  * range(0, 5, 2); // [0, 2, 4]
@@ -348,7 +348,7 @@ export function range(...args: any): number[] {
  * @param from Index to move from
  * @param to Index to move to
  * @example ```ts
- * import { move } from "https://deno.land/x/911@0.1.3/src/collection.ts";
+ * import { move } from "https://deno.land/x/911@0.1.4/src/collection.ts";
  *
  * move([1, 2, 3, 4], 1, 3); // [1, 3, 2, 4]
  * ```
@@ -364,7 +364,7 @@ export function move<T>(arr: T[], from: number, to: number): T[] {
  * @param arr Array to clamp to
  * @param n Number to clamp
  * @example ```ts
- * import { clampArrayRange } from "https://deno.land/x/911@0.1.3/src/collection.ts";
+ * import { clampArrayRange } from "https://deno.land/x/911@0.1.4/src/collection.ts";
  *
  * clampArrayRange([1, 2, 3, 4], 0); // 1
  * clampArrayRange([1, 2, 3, 4], 2); // 2
@@ -381,7 +381,7 @@ export function clampArrayRange<T extends any>(n: number, arr: readonly T[]) {
  * @param arr Array to clamp
  * @param max Number to clamp the array length to
  * @example ```ts
- * import { clampArrayTo } from "https://deno.land/x/911@0.1.3/src/collection.ts";
+ * import { clampArrayTo } from "https://deno.land/x/911@0.1.4/src/collection.ts";
  *
  * clampArrayTo([1, 2, 3, 4], 0); // []
  * clampArrayTo([1, 2, 3, 4], 2); // [1, 2]
@@ -403,7 +403,7 @@ export function clampArrayTo<T extends any>(
  * @param arr Array to clamp
  * @param min Number to clamp the array length to
  * @example ```ts
- * import { clampArrayFrom } from "https://deno.land/x/911@0.1.3/src/collection.ts";
+ * import { clampArrayFrom } from "https://deno.land/x/911@0.1.4/src/collection.ts";
  *
  * clampArrayFrom([1, 2, 3, 4], 0); // [1, 2, 3, 4]
  * clampArrayFrom([1, 2, 3, 4], 1); // [2, 3, 4]
@@ -656,7 +656,7 @@ export function assign<T extends {}, V>(target: T, ...sources: V[]): any {
  * @param predicate the predicate to use to filter the keys
  * @returns a new object with only the keys that match the predicate
  * @example ```ts
- * import { filterKeys } from "https://deno.land/x/911@0.1.3/src/collection.ts";
+ * import { filterKeys } from "https://deno.land/x/911@0.1.4/src/collection.ts";
  * import { assertEquals } from "https://deno.land/std/testing/asserts.ts";
  *
  * const menu = {
@@ -692,7 +692,7 @@ export function filterKeys<T>(
  * that have a value that does not match the given predicate
  * @category Collection
  * @example ```ts
- * import { filterValues } from "https://deno.land/x/911@0.1.3/src/collection.ts";
+ * import { filterValues } from "https://deno.land/x/911@0.1.4/src/collection.ts";
  * import { assertEquals } from "https://deno.land/std/testing/asserts.ts";
  *
  * type Person = { age: number };
@@ -730,7 +730,7 @@ export function filterValues<T>(
  * that do not match the given predicate.
  * @category Collection
  * @example ```ts
- * import { filterEntries } from "https://deno.land/x/911@0.1.3/src/collection.ts";
+ * import { filterEntries } from "https://deno.land/x/911@0.1.4/src/collection.ts";
  * import {
  *   assertEquals
  * } from "https://deno.land/std/testing/asserts.ts";
@@ -774,7 +774,7 @@ export function filterEntries<T>(
  *
  * @category Collection
  * @example ```ts
- * import { mapKeys } from "https://deno.land/x/911@0.1.3/src/collection.ts";
+ * import { mapKeys } from "https://deno.land/x/911@0.1.4/src/collection.ts";
  * import { assertEquals } from "https://deno.land/std/testing/asserts.ts";
  *
  * const counts = { a: 5, b: 3, c: 8 };
@@ -807,7 +807,7 @@ export function mapKeys<T>(
  * @example ```ts
  * import {
  *   mapValues
- * } from "https://deno.land/x/911@0.1.3/src/collection.ts";
+ * } from "https://deno.land/x/911@0.1.4/src/collection.ts";
  * import {
  *   assertEquals
  * } from "https://deno.land/std/testing/asserts.ts";
@@ -843,7 +843,7 @@ export function mapValues<T, O>(
  * a new record containing the results.
  * @category Collection
  * @example ```ts
- * import { mapEntries } from "https://deno.land/x/911@0.1.3/src/collection.ts";
+ * import { mapEntries } from "https://deno.land/x/911@0.1.4/src/collection.ts";
  * import {
  *   assertEquals
  * } from "https://deno.land/std/testing/asserts.ts";
@@ -890,7 +890,7 @@ export function mapEntries<T, O>(
  * @returns A new record containing only the non-nullish and non-empty values.
  * @category Collection
  * @example ```ts
- * import { removeEmptyValues } from "https://deno.land/x/911@0.1.3/src/collection.ts";
+ * import { removeEmptyValues } from "https://deno.land/x/911@0.1.4/src/collection.ts";
  *
  * const obj = { a: 1, b: '', c: null, d: undefined };
  * removeEmptyValues(obj); // { a: 1 }
@@ -917,7 +917,7 @@ export function removeEmptyValues(
  * @returns A new array containing only elements not shared between the two.
  * @category Collection
  * @example ```ts
- * import { diff } from "https://deno.land/x/911@0.1.3/src/collection.ts";
+ * import { diff } from "https://deno.land/x/911@0.1.4/src/collection.ts";
  *
  * diff([1, 2, 3, 4], [1, 2, 3]); // [4]
  * ```
@@ -930,8 +930,8 @@ export function diff(arrA: string[], arrB: string[]): string[] {
  * Splits the given array into chunks of the given size and returns them
  * @category Collection
  * @example ```ts
- * import { chunk } from "https://deno.land/x/911@0.1.3/src/collection.ts";
- * import { assertEquals } from "https://deno.land/x/911@0.1.3/src/asserts.ts";
+ * import { chunk } from "https://deno.land/x/911@0.1.4/src/collection.ts";
+ * import { assertEquals } from "https://deno.land/x/911@0.1.4/src/asserts.ts";
  *
  * const words = [
  *   'lorem',
@@ -978,7 +978,7 @@ export function chunk<T>(array: readonly T[], size: number): T[][] {
  * elements, the latest one will be used (overriding the ones before it).
  * @category Collection
  * @example ```ts
- * import { associateBy } from "https://deno.land/x/911@0.1.3/src/collection.ts";
+ * import { associateBy } from "https://deno.land/x/911@0.1.4/src/collection.ts";
  *
  * const users = [
  *     { id: 'a2e', userName: 'Anna' },
@@ -1011,7 +1011,7 @@ export function associateBy<T>(
  * the latest on will be used (overriding the ones before it).
  * @category Collection
  * @example ```ts
- * import { associateWith } from "https://deno.land/x/911@0.1.3/src/collection.ts";
+ * import { associateWith } from "https://deno.land/x/911@0.1.4/src/collection.ts";
  *
  * const names = [ 'Kim', 'Lara', 'Jonathan' ]
  * const namesToLength = associateWith(names, it => it.length)
@@ -1105,7 +1105,7 @@ export function sortBy<T extends Record<string, any>>(
  *
  * @category Collection
  * @example ```ts
- * import { union } from "https://deno.land/x/911@0.1.3/src/collection.ts";
+ * import { union } from "https://deno.land/x/911@0.1.4/src/collection.ts";
  * import { assertEquals } from "https://deno.land/std@0.152.0/testing/asserts.ts";
  *
  * const soupIngredients = [ 'Pepper', 'Carrots', 'Leek' ]
@@ -1130,7 +1130,7 @@ export function union<T>(...arrays: (readonly T[])[]): T[] {
  *
  * @category Collection
  * @example ```ts
- * import { intersect } from "https://deno.land/x/911@0.1.3/src/collection.ts";
+ * import { intersect } from "https://deno.land/x/911@0.1.4/src/collection.ts";
  * import { assertEquals } from "https://deno.land/std@0.152.0/testing/asserts.ts";
  *
  * const lisaInterests = [ 'Cooking', 'Music', 'Hiking' ]
@@ -1161,7 +1161,7 @@ export function intersect<T>(...arrays: (readonly T[])[]): T[] {
  * @returns reference to the same array
  * @category Collection
  * @example ```ts
- * import { filterInPlace } from "https://deno.land/x/911@0.1.3/src/collection.ts";
+ * import { filterInPlace } from "https://deno.land/x/911@0.1.4/src/collection.ts";
  * import { assertEquals } from "https://deno.land/std@0.152.0/testing/asserts.ts";
  * const numbers = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]
  * filterInPlace(numbers, it => it % 2 === 0)
@@ -1192,7 +1192,7 @@ export function filterInPlace<T>(
  * @returns a new object
  * @category Collection
  * @example ```ts
- * import { pick } from "https://deno.land/x/911@0.1.3/src/collection.ts";
+ * import { pick } from "https://deno.land/x/911@0.1.4/src/collection.ts";
  *
  * const obj1 = { a: 1, b: 4, c: 8 };
  * const obj2 = pick(obj1, ["a", "c"]);
@@ -1217,7 +1217,7 @@ export function pick<
  * Returns the first element having the smallest value according to the provided comparator or undefined if there are no elements
  *
  * @example ```ts
- * import { minWith } from "https://deno.land/x/911@0.1.3/src/collection.ts";
+ * import { minWith } from "https://deno.land/x/911@0.1.4/src/collection.ts";
  * import { assertEquals } from "https://deno.land/std@0.152.0/testing/asserts.ts";
  *
  * const people = ["Kim", "Anna", "John"];
@@ -1249,7 +1249,7 @@ export function minWith<T>(
  * Returns the first element that is the smallest value of the given function or undefined if there are no elements.
  *
  * @example ```ts
- * import { minBy } from "https://deno.land/x/911@0.1.3/src/collection.ts";
+ * import { minBy } from "https://deno.land/x/911@0.1.4/src/collection.ts";
  * import { assertEquals } from "https://deno.land/std@0.152.0/testing/asserts.ts"
  *
  * const people = [
@@ -1512,7 +1512,7 @@ export function maxBy<T>(
  * Example:
  *
  * ```ts
- * import { distinct } from "https://deno.land/x/911@0.1.3/src/collection.ts";
+ * import { distinct } from "https://deno.land/x/911@0.1.4/src/collection.ts";
  * import { assertEquals } from "https://deno.land/std@$STD_VERSION/testing/asserts.ts";
  *
  * const numbers = [ 3, 2, 5, 2, 5 ]
@@ -1536,7 +1536,7 @@ export function distinct<T>(array: readonly T[]): T[] {
  * Example:
  *
  * ```ts
- * import { distinctBy } from "https://deno.land/x/911@0.1.3/src/collection.ts";
+ * import { distinctBy } from "https://deno.land/x/911@0.1.4/src/collection.ts";
  * import { assertEquals } from "https://deno.land/std@$STD_VERSION/testing/asserts.ts";
  *
  * const names = [ 'Anna', 'Kim', 'Arnold', 'Kate' ]
@@ -1571,7 +1571,7 @@ export function distinctBy<T, D>(
  * Applies the given aggregator to each group in the given Grouping, returning the results together with the respective group keys
  *
  * ```ts
- * import { aggregateGroups } from "https://deno.land/x/911@0.1.3/src/collection.ts";
+ * import { aggregateGroups } from "https://deno.land/x/911@0.1.4/src/collection.ts";
  * import { assertEquals } from "https://deno.land/std@$STD_VERSION/testing/asserts.ts";
  *
  * const foodProperties = {

@@ -45,7 +45,7 @@ export class State<T extends any = unknown> {
    * @param value The value to set for the given key
    * @returns `State` instance, for optional chaining
    * @example ```ts
-   * import { State } from "https://deno.land/x/911@0.1.3/src/state.ts";
+   * import { State } from "https://deno.land/x/911@0.1.4/src/state.ts";
    * const state = new State();
    *
    * state.set("a", 1);
@@ -118,7 +118,7 @@ export class State<T extends any = unknown> {
    * @param key - the key to lookup
    * @returns `true` if the key exists in State, `false` otherwise.
    * @example ```ts
-   * import { State } from "https://deno.land/x/911@0.1.3/src/state.ts";
+   * import { State } from "https://deno.land/x/911@0.1.4/src/state.ts";
    *
    * const state = new State([['a', 1]]);
    * state.has("a"); // true
@@ -135,7 +135,7 @@ export class State<T extends any = unknown> {
    * @returns `Record<string, boolean>`
    *
    * @example ```ts
-   * import { State } from "https://deno.land/x/911@0.1.3/src/state.ts";
+   * import { State } from "https://deno.land/x/911@0.1.4/src/state.ts";
    *
    * const state = new State([["a", 1], ["b", 2]]);
    * state.has(["a", "b", "c"]);
@@ -161,7 +161,7 @@ export class State<T extends any = unknown> {
    * @returns the `State` instance, for optional chaining
    *
    * @example ```ts
-   * import { State } from "https://deno.land/x/911@0.1.3/src/state.ts";
+   * import { State } from "https://deno.land/x/911@0.1.4/src/state.ts";
    *
    * const state = new State([["a", 1], ["b", 2], ["c", 3]]);
    * state.delete("a");
@@ -178,7 +178,7 @@ export class State<T extends any = unknown> {
    * @returns the `State` instance, for optional chaining
    *
    * @example ```ts
-   * import { State } from "https://deno.land/x/911@0.1.3/src/state.ts";
+   * import { State } from "https://deno.land/x/911@0.1.4/src/state.ts";
    *
    * const state = new State([['a', 1], ['b', 2], ['c', 3]]);
    * state.delete(['a', 'b', 'c']);
@@ -202,7 +202,7 @@ export class State<T extends any = unknown> {
    * Clears all values from the State instance.
    * @returns the `State` instance, for optional chaining.
    * @example ```ts
-   * import { State } from "https://deno.land/x/911@0.1.3/src/state.ts";
+   * import { State } from "https://deno.land/x/911@0.1.4/src/state.ts";
    *
    * const state = new State([['a', 1], ['b', 2], ['c', 3]]);
    * state.clear();
@@ -223,7 +223,7 @@ export class State<T extends any = unknown> {
    * `callbackfn`, defaults to the State instance.
    * @returns an array of the returned `callbackfn` values.
    * @example ```ts
-   * import { State } from "https://deno.land/x/911@0.1.3/src/state.ts";
+   * import { State } from "https://deno.land/x/911@0.1.4/src/state.ts";
    *
    * const state = new State([['a', 1], ['b', 2]]);
    * state.map((value, key) => value + key); // ['a1', 'b2']
