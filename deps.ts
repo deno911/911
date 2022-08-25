@@ -1,7 +1,7 @@
 // fmt.ts
-export * as ansi from "https://deno.land/std@0.152.0/fmt/colors.ts";
-export { prettyBytes } from "https://deno.land/std@0.152.0/fmt/bytes.ts";
-export { printf, sprintf } from "https://deno.land/std@0.152.0/fmt/printf.ts";
+export * as ansi from "https://deno.land/std@0.153.0/fmt/colors.ts";
+export { prettyBytes } from "https://deno.land/std@0.153.0/fmt/bytes.ts";
+export { printf, sprintf } from "https://deno.land/std@0.153.0/fmt/printf.ts";
 
 // is
 export {
@@ -33,29 +33,31 @@ export {
   toIMF,
   type Unit,
   weekOfYear,
-} from "https://deno.land/std@0.152.0/datetime/mod.ts";
+} from "https://deno.land/std@0.153.0/datetime/mod.ts";
 
 // dotenv
-export { config as dotenv } from "https://deno.land/std@0.152.0/dotenv/mod.ts";
+export { config as dotenv } from "https://deno.land/std@0.153.0/dotenv/mod.ts";
 
 // http-cache
 export * from "https://deno.land/x/httpcache@0.1.2/in_memory.ts";
 
 // http
-export * from "https://deno.land/std@0.152.0/http/server.ts";
-export * from "https://deno.land/std@0.152.0/http/http_errors.ts";
-export * from "https://deno.land/std@0.152.0/http/util.ts";
-export * from "https://deno.land/std@0.152.0/http/cookie.ts";
-export * from "https://deno.land/std@0.152.0/http/http_status.ts";
-export { contentType as getContentType } from "https://deno.land/std@0.152.0/media_types/mod.ts";
+export * from "https://deno.land/std@0.153.0/http/server.ts";
+export * from "https://deno.land/std@0.153.0/http/http_errors.ts";
+export * from "https://deno.land/std@0.153.0/http/util.ts";
+export * from "https://deno.land/std@0.153.0/http/cookie.ts";
+export * from "https://deno.land/std@0.153.0/http/http_status.ts";
+export { contentType as getContentType } from "https://deno.land/std@0.153.0/media_types/mod.ts";
 
 // path
-export * as path from "https://deno.land/std@0.152.0/path/mod.ts";
+export * as path from "https://deno.land/std@0.153.0/path/mod.ts";
 
 // preact
-export * from "https://esm.sh/preact@10.10.1?target=deno";
-// export * from "https://x.lcas.dev/preact@10.5.12/jsx.d.ts";
-export { render as renderToString } from "https://esm.sh/preact-render-to-string@5.2.1?target=deno";
+export * from "https://esm.sh/preact@10.10.6?target=deno";
+export {
+  render as renderToString,
+  shallowRender as shallowRenderToString,
+} from "https://esm.sh/preact-render-to-string@5.2.1?target=deno";
 
 // docs
-export { doc } from "https://deno.land/x/deno_doc@0.39.0/mod.ts";
+export { doc } from "https://deno.land/x/deno_doc@0.43.0/mod.ts";

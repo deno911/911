@@ -1,9 +1,7 @@
 {
-  "importMap": "./import_map.json",
   "tasks": {
-    "flint": "deno fmt && deno lint --unstable",
-    "prepare": "deno install -A -f -n land https://deno.land/x/land@v0.9.3/cli.ts",
-    "release": "which land &>/dev/null || deno task prepare; deno task flint && land publish -A"
+    "prepare": "which land &>/dev/null || deno install -A -f -n land https://deno.land/x/land@v0.9.3/cli.ts &>/dev/null; deno fmt && deno lint --unstable && deno test -A --unstable --no-check;",
+    "publish": "deno task prepare && land publish -A"
   },
   "compilerOptions": {
     "lib": [
