@@ -6,7 +6,7 @@
 
 import { ansi, cases } from "./fmt.ts";
 import { is } from "./type.ts";
-import { deepMerge } from "./collection.ts";
+import { deepMerge, ensureArray } from "./collection.ts";
 
 export enum LogLevel {
   Log = -1,
@@ -17,53 +17,73 @@ export enum LogLevel {
   Fatal,
 }
 
-type ConsoleMethods = "log" | "debug" | "info" | "warn" | "error";
+export type LogLevelName = keyof typeof LogLevel;
 
-export type Options = Partial<{
+type ConsoleMethods = Exclude<Lowercase<LogLevelName>, "fatal">;
+// "log" | "debug" | "info" | "warn" | "error";
+
+declare type PossibleLogLevels =
+  | Lowercase<LogLevelName>
+  | Capitalize<Lowercase<LogLevelName>>
+  | Uppercase<LogLevelName>;
+
+type LogColors = Exclude<
+  keyof typeof ansi,
+  | `${string}ColorEnabled`
+  | "stripColor"
+  | "reset"
+  | "rgb8"
+  | "rgb24"
+  | "bgRgb8"
+  | "bgRgb24"
+>;
+interface Options {
   /**
    * The minimum log level to log. Any incoming messages at a lower level will
    * be silently ignored. For example, for level `Error` (3), only `error` and
    * `fatal` messages will be logged (and `Debug`, `Warn`, `Info` are ignored).
    * @default LogLevel.Info (1)
    */
-  level: LogLevel | LogLevelName;
+  level?: LogLevel | PossibleLogLevels;
   /**
    * Enable or disable the Timing feature for this Logger instance.
    * @see {@link Timing} for more details.
    * @default false (disabled)
    */
-  timing: boolean;
+  timing?: boolean;
   /**
    * When enabled, each message logged to the output stream will be prefixed
    * with a label indicating the log level (i.e. `INFO` or `ERROR`). Set to
    * `false` to disable this feature, or provide an object of log level names
    * for keys and your desired labels for values.
    */
-  labels: false | { [key in keyof typeof LogLevel]: string };
+  labels?: Partial<Record<LogLevelName, string>> | false;
   /**
    * Set to false to disable color output, or pass an object with log level
    * names as keys and color names as values to customize the colors.
    */
-  colors: false | { [key in keyof typeof LogLevel]: LogColors };
+  colors?: Partial<Record<LogLevelName, LogColors | LogColors[]>> | false;
   /**
    * When enabled, each message logged to the output stream will be prefixed
    * with a timestamp in ISO 8601 format (i.e. `2020-01-01T00:00:00.000Z`).
    * @default true (enabled)
    */
-  timestamp: boolean;
+  timestamp?: boolean;
   /**
    * When set to `false`, forcibly disables `color`, `label`, and `newline`
    * (even if they were otherwise enabled individually).
    * @default true (enabled)
    */
-  pretty: boolean;
+  pretty?: boolean;
   /**
    * When enabled, each message logged to the output stream will be prefixed
    * with a newline character (`\n`, [or `\r\n` for Windows]).
    * @default false (disabled)
    */
-  newline: boolean;
-}>;
+  newline?: boolean;
+}
+
+export type { Options as LoggerOptions };
 
 export class Timing {
   #t = performance.now();
@@ -74,20 +94,38 @@ export class Timing {
 
   stop(message: string) {
     const now = performance.now();
-    const d = Math.round(now - this.#t);
-    let cf = ansi.green;
-    if (d > 10000) {
-      cf = ansi.red;
-    } else if (d > 1000) {
-      cf = ansi.yellow;
-    }
-    console.debug(ansi.dim("TIMING"), message, "in", cf(d + "ms"));
+    const elapsed = Math.round(now - this.#t);
+    const cf = elapsed > 3e4 // 30+ seconds
+      ? (s: any) => ansi.bold(ansi.brightRed(s))
+      : elapsed > 1e4 // 10 - 30 seconds
+      ? ansi.red
+      : elapsed > 1e3 // 1 - 10 seconds
+      ? ansi.yellow
+      : ansi.green; // under 1s
+
+    console.debug(ansi.dim("TIMING"), message, "in", cf(elapsed + "ms"));
     this.#t = now;
   }
 }
 
 export class Logger {
-  #level: LogLevel = LogLevel.Info;
+  constructor(levelName: LogLevelName);
+  constructor(level: LogLevel);
+  constructor(options?: Partial<Options>);
+  constructor(
+    init: any = Logger.#defaults,
+  ) {
+    if (is.nullOrUndefined(init)) {
+      this.options = Logger.#defaults;
+    } else if (is.plainObject<Options>(init)) {
+      this.options = init;
+    } else {
+      this.options = {
+        level: (init as LogLevel | PossibleLogLevels),
+      };
+    }
+    return this;
+  }
 
   static readonly #defaults: RequiredOptions = {
     level: LogLevel.Info,
@@ -96,12 +134,12 @@ export class Logger {
     pretty: true,
     newline: false,
     colors: {
-      Debug: "cyan",
-      Info: "green",
-      Log: "dim",
-      Warn: "yellow",
-      Error: "red",
-      Fatal: "brightRed",
+      Debug: ["cyan"],
+      Info: ["green"],
+      Log: ["dim"],
+      Warn: ["yellow"],
+      Error: ["red"],
+      Fatal: ["brightRed"],
     },
     labels: {
       Debug: "DEBUG",
@@ -113,37 +151,21 @@ export class Logger {
     },
   };
 
-  #options: RequiredOptions = Logger.#defaults;
+  #options: Required<Options> = Logger.#defaults;
 
-  set options(options: Options) {
-    this.#options = deepMerge(Logger.#defaults, this.#options);
-    this.#options = deepMerge(this.#options, options);
+  set options(options: Partial<Options>) {
+    this.#options = deepMerge<Required<Options>>(
+      Logger.#defaults,
+      options,
+    );
+    this.setLevel(this.options.level);
   }
 
   get options(): RequiredOptions {
     return this.#options ?? Logger.#defaults;
   }
 
-  constructor(level?: LogLevel | LogLevelName);
-  constructor(options: Options);
-  constructor(
-    init: Options | LogLevel | LogLevelName = Logger.#defaults,
-  ) {
-    if (is.plainObject<Options>(init)) {
-      this.options = deepMerge<Options>(
-        this.options,
-        init as Options,
-      );
-    } else if ((init as any) in LogLevel) {
-      this.options = deepMerge<Options>(this.options, {
-        level: (init as LogLevel),
-      });
-    } else if (is.nullOrUndefined(init)) {
-      this.options = Logger.#defaults;
-    }
-    this.setLevel(this.options.level);
-    return this;
-  }
+  #level: LogLevel = LogLevel.Info;
 
   get level(): LogLevel {
     return this.#level;
@@ -153,7 +175,7 @@ export class Logger {
     this.#level = level;
   }
 
-  setLevel(level: LogLevel | LogLevelName): void {
+  setLevel(level: LogLevel | PossibleLogLevels): void {
     if (level in LogLevel) {
       this.#level = LogLevel[level as keyof typeof LogLevel];
     } else if (is.string(level)) {
@@ -184,7 +206,7 @@ export class Logger {
   }
 
   debug(...args: unknown[]): void {
-    if (this.#level <= LogLevel.Debug) {
+    if (this.level <= LogLevel.Debug) {
       this.#print("Debug", ...args);
     }
   }
@@ -222,7 +244,7 @@ export class Logger {
    * ```
    */
   info(...args: unknown[]): void {
-    if (this.#level <= LogLevel.Info) {
+    if (this.level <= LogLevel.Info) {
       this.#print("Info", ...args);
     }
   }
@@ -247,7 +269,7 @@ export class Logger {
    * ```
    */
   warn(...args: unknown[]): void {
-    if (this.#level <= LogLevel.Warn) {
+    if (this.level <= LogLevel.Warn) {
       this.#print("Warn", ...args);
     }
   }
@@ -272,7 +294,7 @@ export class Logger {
    * ```
    */
   error(...args: unknown[]): void {
-    if (this.#level <= LogLevel.Error) {
+    if (this.level <= LogLevel.Error) {
       this.#print("Error", ...args);
     }
   }
@@ -311,8 +333,13 @@ export class Logger {
     }
     if (this.options.labels) {
       const label = this.options.labels[level];
-      if (this.options.colors && this.options.colors[level]) {
-        args.unshift(ansi[this.options.colors[level]](ansi.bold(label)));
+      if (is.object(this.options.colors) && this.options.colors[level]) {
+        const colors: Exclude<typeof this.options.colors, boolean> = this
+          .options.colors;
+        const colorFn = (s: string) =>
+          ensureArray<LogColors>(colors[level])
+            .reduce((acc, c) => ansi[c](acc), ansi.bold(s));
+        args.unshift(colorFn(label));
       } else {
         args.unshift(label);
       }
@@ -328,7 +355,7 @@ export class Logger {
     reset(): void;
     stop(message?: string): void;
   } {
-    if (this.level === LogLevel.Debug) {
+    if (this.level === LogLevel.Debug || this.options.timing) {
       return new Timing();
     }
     return {
@@ -337,21 +364,6 @@ export class Logger {
     };
   }
 }
-
-export declare type LogLevelName =
-  | Lowercase<keyof typeof LogLevel>
-  | Capitalize<Lowercase<keyof typeof LogLevel>>
-  | Uppercase<keyof typeof LogLevel>;
-
-type LogColors = Exclude<
-  keyof typeof ansi,
-  | `${string}ColorEnabled`
-  | "stripColor"
-  | "reset"
-  | "rgb8"
-  | "rgb24"
-  | `bg${string}`
->;
 
 export declare type RequiredOptions = Required<Options>;
 
