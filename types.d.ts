@@ -1,14 +1,14 @@
-// deno-lint-ignore-file ban-types no-explicit-any
+// deno-lint-ignore-file
 
-declare type Maybe<T extends any> = T | undefined;
+type Maybe<T extends any> = T | undefined;
 
-declare type Obj<T extends string = string> = Record<string, T>;
+type Obj<T extends string = string> = Record<string, T>;
 
 /**
  * Matches any primitive value.
  * @see https://mdn.io/Primitive
  */
-declare type Primitive =
+type Primitive =
   | null
   | undefined
   | string
@@ -21,7 +21,7 @@ declare type Primitive =
  * Matches a `class` constructor.
  * @see https://mdn.io/Classes.
  */
-declare type Class<T = unknown, Arguments extends any[] = any[]> = new (
+type Class<T = unknown, Arguments extends any[] = any[]> = new (
   ...arguments_: Arguments
 ) => T;
 
@@ -29,7 +29,7 @@ declare type Class<T = unknown, Arguments extends any[] = any[]> = new (
  * Matches any [typed array](https://mdn.io/TypedArray).
  * @see https://mdn.io/TypedArray
  */
-declare type TypedArray =
+type TypedArray =
   | Int8Array
   | Uint8Array
   | Uint8ClampedArray
@@ -42,36 +42,36 @@ declare type TypedArray =
   | BigInt64Array
   | BigUint64Array;
 
-declare type Falsey = false | 0 | 0n | "" | null | undefined;
+type Falsey = false | 0 | 0n | "" | null | undefined;
 
 /**
  * Promise, or maybe not
  */
-declare type Awaitable<T> = T | PromiseLike<T>;
+type Awaitable<T> = T | PromiseLike<T>;
 
 /**
  * Null or whatever
  */
-declare type Nullable<T> = T | null | undefined;
+type Nullable<T> = T | null | undefined;
 
 /**
  * Array, or not yet
  */
-declare type Arrayable<T> = T | Array<T>;
+type Arrayable<T> = T | Array<T>;
 
 /**
  * Function
  */
-declare type Method<T = void> = import("./src/type.ts").Method<T>;
+type Method<T = void> = import("./src/type.ts").Method<T>;
 
-declare type Fn<T = void, A = any> = import("./src/type.ts").Fn<T, A>;
+type Fn<T = void, A = any> = import("./src/type.ts").Fn<T, A>;
 
 /**
  * Constructor
  */
-declare type Constructor<T = void, A = void> = new (...args: A[]) => T;
+type Constructor<T = void, A = void> = new (...args: A[]) => T;
 
-declare interface Constructable {
+interface Constructable {
   new (...args: any[]): any;
 }
 
@@ -82,20 +82,20 @@ declare interface Constructable {
  * @returns U items intersected
  * @see https://stackoverflow.com/a/50375286/9259330
  */
-declare type UnionToIntersection<U> =
+type UnionToIntersection<U> =
   (U extends unknown ? (k: U) => void : never) extends (k: infer I) => void ? I
     : never;
 
 /**
  * Infers the arguments type of a function
  */
-declare type ArgumentsType<T> = T extends (...args: infer A) => any ? A : never;
+type ArgumentsType<T> = T extends (...args: infer A) => any ? A : never;
 
-declare type MergeInsertions<T> = T extends object
+type MergeInsertions<T> = T extends object
   ? { [K in keyof T]: MergeInsertions<T[K]> }
   : T;
 
-declare type DeeperMerge<F, S> = MergeInsertions<
+type DeeperMerge<F, S> = MergeInsertions<
   {
     [K in keyof F | keyof S]: K extends keyof S & keyof F
       ? DeepMerge<F[K], S[K]>
@@ -108,16 +108,16 @@ declare type DeeperMerge<F, S> = MergeInsertions<
 /**
  * Infers the element type of an array
  */
-declare type ElementOf<T> = T extends (infer E)[] ? E : never;
+type ElementOf<T> = T extends (infer E)[] ? E : never;
 
-declare type StringLiteralUnion<T extends U, U = string> = T | (U & {});
+type StringLiteralUnion<T extends U, U = string> = T | (U & {});
 
-declare type MockMap = Map<
+type MockMap = Map<
   string,
   Record<string, string | null | (() => unknown)>
 >;
 
-declare type MutableArray<T extends readonly any[]> = {
+type MutableArray<T extends readonly any[]> = {
   -readonly [k in keyof T]: T[k];
 };
 
