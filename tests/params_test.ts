@@ -2,13 +2,7 @@
 /// <reference lib="deno.ns" />
 /// <reference lib="esnext" />
 
-import {
-  assertArrayIncludes,
-  assertEquals,
-  assertInstanceOf,
-} from "../deps_test.ts";
-
-import { Params } from "../src/params.ts";
+import { Params } from "./deps.ts";
 
 Deno.test({
   name: "Params.parse(string)",

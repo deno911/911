@@ -2,8 +2,7 @@
 /// <reference lib="deno.ns" />
 /// <reference lib="esnext" />
 
-import { assertEquals } from "../deps_test.ts";
-import * as date from "../src/date.ts";
+import { date } from "./deps.ts";
 
 Deno.test({
   name: "date.relative()",
@@ -24,8 +23,8 @@ Deno.test({
 Deno.test({
   name: "date.difference()",
   fn(test) {
-    const then = +Date.now() - (1e3 * 3600);
     const now = +Date.now();
+    const then = now - (1e3 * 3600);
     const result = date.difference(then, now, {
       units: ["minutes", "seconds", "milliseconds"],
     });

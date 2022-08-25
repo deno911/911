@@ -1,22 +1,4 @@
-import { memoize } from "../src/memoize.ts";
-import {
-  beforeAll,
-  beforeEach,
-  describe,
-  it,
-  TestSuite,
-} from "https://deno.land/std@0.152.0/testing/bdd.ts";
-import {
-  assertSpyCall,
-  assertSpyCallArg,
-  assertSpyCallArgs,
-  assertSpyCalls,
-  spy,
-} from "https://deno.land/std@0.152.0/testing/mock.ts";
-import {
-  assertArrayIncludes,
-  assertEquals,
-} from "https://deno.land/std@0.152.0/testing/asserts.ts";
+import { assertSpyCalls, memoize, spy } from "./deps.ts";
 
 const noop: () => null = () => null;
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

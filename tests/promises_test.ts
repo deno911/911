@@ -8,8 +8,7 @@ import {
   createPromiseLock,
   createSingletonPromise,
   p,
-} from "../src/promises.ts";
-import { assert } from "../deps_test.ts";
+} from "./deps.ts";
 
 const tests = <Deno.TestDefinition[]> [
   {

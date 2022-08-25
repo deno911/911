@@ -2,8 +2,7 @@
 /// <reference lib="deno.ns" />
 /// <reference lib="esnext" />
 
-import { assertEquals } from "../deps_test.ts";
-import { debounce, sleep, throttle } from "../src/promises.ts";
+import { debounce, sleep, throttle } from "./deps.ts";
 
 Deno.test({
   name: "throttle",

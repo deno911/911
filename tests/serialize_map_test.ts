@@ -2,8 +2,7 @@
 /// <reference lib="deno.ns" />
 /// <reference lib="esnext" />
 
-import { assertEquals, assertInstanceOf } from "../deps_test.ts";
-import { SerializeMap } from "../src/serialize_map.ts";
+import { SerializeMap } from "./deps.ts";
 
 const init = () =>
   new SerializeMap([

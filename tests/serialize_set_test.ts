@@ -2,8 +2,7 @@
 /// <reference lib="deno.ns" />
 /// <reference lib="esnext" />
 
-import { assertEquals, assertInstanceOf } from "../deps_test.ts";
-import { SerializeSet } from "../src/serialize_set.ts";
+import { SerializeSet } from "./deps.ts";
 
 const init = () => new SerializeSet([1, 1, 2, 3]);
 
