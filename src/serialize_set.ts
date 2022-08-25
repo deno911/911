@@ -4,7 +4,7 @@
  * valid `JSON` array when passed to `JSON.stringify` (rather than `{}`, like
  * its simple-minded cousin, Set).
  * @example ```ts
- * import { SerializeSet } from "https://deno.land/x/911@0.1.4/src/serialize_set.ts";
+ * import { SerializeSet } from "https://deno.land/x/911@0.1.5/src/serialize_set.ts";
  *
  * const bad = new Set([1, 2, 3]);
  *
@@ -19,7 +19,7 @@
  * JSON.stringify(good);
  * // [1, 2, 3]
  * ```
- * @see {@link https://deno.land/x/911@0.1.4/src/serialize_set.ts}
+ * @see {@link https://deno.land/x/911@0.1.5/src/serialize_set.ts}
  * @author Nicholas Berlette <https://github.com/nberlette>
  * @license MIT
  */

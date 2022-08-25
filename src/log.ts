@@ -219,7 +219,7 @@ export class Logger {
    * @returns void
    * @see {@link LogLevel.Info}
    * @example ```ts
-   * import { Logger } from "https://deno.land/x/911@0.1.4/src/log.ts";
+   * import { Logger } from "https://deno.land/x/911@0.1.5/src/log.ts";
    * const logger = new Logger();
    *
    * logger.log("Hello, world!");
@@ -237,7 +237,7 @@ export class Logger {
    * @returns void
    * @see {@link LogLevel.Info}
    * @example ```ts
-   * import { Logger } from "https://deno.land/x/911@0.1.4/src/log.ts";
+   * import { Logger } from "https://deno.land/x/911@0.1.5/src/log.ts";
    * const logger = new Logger("info");
    * logger.info("Hello, world!");
    * // INFO 2022-08-19T20:18:41 Hello world!
@@ -256,7 +256,7 @@ export class Logger {
    * @returns void
    * @see {@link LogLevel.Warn}
    * @example ```ts
-   * import { Logger } from "https://deno.land/x/911@0.1.4/src/log.ts";
+   * import { Logger } from "https://deno.land/x/911@0.1.5/src/log.ts";
    * const logger = new Logger();
    * logger.setLevel("debug");
    *
@@ -281,7 +281,7 @@ export class Logger {
    * @returns void
    * @see {@link LogLevel.Error}
    * @example ```ts
-   * import { Logger } from "https://deno.land/x/911@0.1.4/src/log.ts";
+   * import { Logger } from "https://deno.land/x/911@0.1.5/src/log.ts";
    * const logger = new Logger();
    *
    * logger.setLevel("error");
@@ -307,7 +307,7 @@ export class Logger {
    * @returns void
    * @see {@link LogLevel.Fatal}
    * @example ```ts
-   * import { Logger } from "https://deno.land/x/911@0.1.4/src/log.ts";
+   * import { Logger } from "https://deno.land/x/911@0.1.5/src/log.ts";
    * const logger = new Logger();
    *
    * logger.fatal("Hello, world!");

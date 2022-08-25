@@ -49,7 +49,7 @@ export const defaultOptions = {
  * @param opts The options to use for memoization.
  * @returns A memoized version of the function.
  * @example ```ts
- * import { memoize } from "https://deno.land/x/911@0.1.4/src/memoize.ts";
+ * import { memoize } from "https://deno.land/x/911@0.1.5/src/memoize.ts";
  *
  * const fn = (a: number, b: number) => a + b;
  * const memoized = memoize(fn);
@@ -58,7 +58,7 @@ export const defaultOptions = {
  * memoized(1, 2); // => 3
  * ```
  * @example ```ts
- * import { memoize } from "https://deno.land/x/911@0.1.4/src/memoize.ts";
+ * import { memoize } from "https://deno.land/x/911@0.1.5/src/memoize.ts";
  *
  * const fn = memoize(function doExpensiveStuff() {
  *   // Here's where you do expensive stuff!
@@ -115,7 +115,7 @@ type MemoizeDecoratorFactory<A extends unknown[], R, T> = (
  * @param options Define your own cache or hash function (both optional).
  * @returns
  * @example ```ts
- * import { memoized } from "https://deno.land/x/911@0.1.4/src/memoize.ts";
+ * import { memoized } from "https://deno.land/x/911@0.1.5/src/memoize.ts";
  *
  * const cache = new Map();
  * class MyClass {
